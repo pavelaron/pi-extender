@@ -1,0 +1,21 @@
+[package]
+name = "pi_extender"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+ferris-says = "0.3.2"
+hsh = "0.0.8"
+vrd = "0.0.8"
+serde = { version = "1.0.209", features = ["derive"] }
+rocket = { version = "0.5.1", features = ["json"] }
+rocket-jwt = "0.5.2"
+rocket_dyn_templates = { version = "0.2.0", features = ["handlebars"] }
+sled = "0.34.7"
+chrono = "0.4.39"
+jsonwebtoken = "9.3.0"
+dotenv = "0.15.0"
+sysinfo = "0.33.1"
+local-ip-address = "0.6.3"

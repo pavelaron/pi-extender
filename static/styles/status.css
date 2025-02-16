@@ -1,0 +1,16 @@
+.container-status {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	padding: 20px;
+	margin: auto 10px;
+	max-width: 300px;
+}
+
+.container-info {
+	margin: auto 8px;
+}
+
+.info-item {
+	margin-bottom: 30px;
+}

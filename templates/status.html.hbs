@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Admin server status</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta name="boot_time" content="{{ boot_time }}">
+
+		<link rel="stylesheet" href="/styles/main.css">
+		<link rel="stylesheet" href="/styles/status.css">
+	</head>
+	<body>
+		<div class="container-main">
+			<div class="container-page">
+				<div class="card container-status">
+					<div class="container-image">
+						<img src="/images/app-icons/web/icon-512.png" alt="pi-extender">
+					</div>
+					<h1 class="card-title">Status</h1>
+					<pre class="output">{{ response }}</pre>
+					<hr>
+					<div class="container-info">
+						<div class="info-item">
+							<h2>Uptime</h2>
+							<div id="uptime">---</div>
+						</div>
+						<div class="info-item">
+							<h2>Load Average (5 min.)</h2>
+							<div>{{ load_avg }}</div>
+						</div>
+						<div class="info-item">
+							<h2>Free memory</h2>
+							<div>{{ memory }}</div>
+						</div>
+						<div class="info-item">
+							<h2>Hostname</h2>
+							<div>{{ hostname }}</div>
+						</div>
+						<div class="info-item">
+							<h2>IP address</h2>
+							<div>{{ local_ip }}</div>
+						</div>
+						<div class="info-item">
+							<h2>Network interfaces</h2>
+							<pre>{{ interfaces }}</pre>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<script type="text/javascript" src="/scripts/status.js"></script>
+	</body>
+</html>

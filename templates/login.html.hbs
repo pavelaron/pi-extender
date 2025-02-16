@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Admin page login</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="stylesheet" href="/styles/main.css">
+		<link rel="stylesheet" href="/styles/login.css">
+	</head>
+	<body>
+		<div class="container-main">
+			<div class="card form-login">
+				<h1 class="card-title">Admin page login</h1>
+				<form action="/" method="POST">
+					<input type="text" class="card" name="username" placeholder="Username" required>
+					<input type="password" class="card" name="password" pattern=".{8,}" placeholder="Password" required>
+					<input type="submit" class="card" value="Login">
+				</form>
+			</div>
+		</div>
+	</body>
+</html>
