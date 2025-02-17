@@ -32,11 +32,13 @@ pub fn status_page(_user: AuthenticatedUser) -> Template {
   let hostname = System::host_name();
   let total_mem = system.total_memory();
   let ip = local_ip().unwrap();
-  let network_interfaces = list_afinet_netifas()
+  let network_interfaces: String = list_afinet_netifas()
     .unwrap()
     .iter()
-    .map(|(name, ip)| format!("{}:\t{:?}\n", name, ip))
-    .reduce(|acc, line| format!("{acc}{line}"));
+    .fold(
+      String::from(""), 
+      |acc: String, (name, ip)| format!("{}{}:\t{:?}\n", acc, name, ip),
+    );
 
   Template::render("status", context! {
     response: response_str,
