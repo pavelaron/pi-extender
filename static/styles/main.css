@@ -73,6 +73,7 @@ input {
 input.card {
 	position: relative;
 	outline: none;
+	z-index: 1;
 }
 
 /* On mouse-over, add a deeper shadow */
