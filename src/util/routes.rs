@@ -51,10 +51,9 @@ pub fn status_page(_user: AuthenticatedUser) -> Template {
   })
 }
 
-#[get("/user/profile")]
-pub fn profile(user: AuthenticatedUser) -> String {
-    // Only accessible with valid JWT token
-    format!("Profile for user: {}", user.user_id)
+#[get("/wireless-settings")]
+pub fn wireless(_user: AuthenticatedUser) -> Template {
+  Template::render("wireless", context! {})
 }
 
 #[post("/", data = "<login_input>")]

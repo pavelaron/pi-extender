@@ -1,0 +1,10 @@
+.container-wireless {
+	width: 100%;
+	padding: 20px;
+	margin: auto 10px;
+	max-width: 300px;
+}
+
+.container-wireless form {
+	margin: 45px auto;
+}

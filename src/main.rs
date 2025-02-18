@@ -30,7 +30,6 @@ use crate::util::{
   routes,
 };
 
-
 #[macro_use]
 extern crate rocket;
 
@@ -102,7 +101,7 @@ fn launch() -> Rocket<Build> {
       routes::index,
       routes::auth,
       routes::status_page,
-      routes::profile,
+      routes::wireless,
       routes::restart,
       routes::logout,
     ],

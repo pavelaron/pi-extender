@@ -34,13 +34,59 @@ html, body {
 	transition: 0.3s;
 }
 
+.label {
+	display: block;
+	position: relative;
+	margin-top: 30px;
+}
+
+.label .label-text {
+	position: absolute;
+	top: -22px;
+	left: 8px;
+	color: rgba(0, 0, 0, 0.6);
+	padding: 2px;
+	transition: .2s all ease-in-out;
+}
+
+input[type="submit"] {
+	background-color: rgb(96, 125, 139);
+	color: white;
+	cursor: pointer;
+}
+
+input:placeholder-shown + .label-text {
+	opacity: 0;
+	top: 0;
+}
+
+input {
+	display: block;
+	width: 100%;
+	box-sizing: border-box;
+	margin: 18px auto;
+	border: none;
+	padding: 18px 20px;
+	font-family: monospace;
+}
+
 input.card {
+	position: relative;
 	outline: none;
 }
 
 /* On mouse-over, add a deeper shadow */
 input.card:hover {
 	box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+}
+
+input:not(placeholder-shown):after {
+	/* content: attr(placeholder); */
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	background-color: red;
 }
 
 .container-image {
