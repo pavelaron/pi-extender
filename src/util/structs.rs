@@ -19,6 +19,14 @@ pub struct LoginInput {
   pub password: String,
 }
 
+#[derive(FromForm)]
+pub struct WirelessInput {
+  pub source_ssid: String,
+  pub source_password: String,
+  pub ap_ssid: String,
+  pub ap_password: String,
+}
+
 #[derive(Serialize)]
 pub struct TokenResponse {
   token: String,

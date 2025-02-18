@@ -3,7 +3,6 @@
 	<head>
 		<title>Wireless settings</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 		<link rel="stylesheet" href="/styles/main.css">
 		<link rel="stylesheet" href="/styles/wireless.css">
 	</head>
@@ -15,10 +14,26 @@
 						<img src="/images/app-icons/web/icon-512.png" alt="pi-extender">
 					</div>
 					<h1 class="card-title">Wireless settings</h1>
-					<form action="/" method="POST">
-						<label class="label" for="username">
-							<input type="text" class="card" name="username" placeholder="Username">
-							<div class="label-text">Username</div>
+					<form action="/save-wireless" method="POST">
+						<h2>Source</h2>
+						<hr>
+						<label class="label" for="source_ssid">
+							<input type="text" class="card" name="source_ssid" placeholder="Source SSID">
+							<div class="label-text">Source SSID</div>
+						</label>
+						<label class="label" for="source_pwd">
+							<input type="password" class="card" name="source_pwd" pattern=".{8,}" placeholder="Source password">
+							<div class="label-text">Source password</div>
+						</label>
+						<h2>Access point</h2>
+						<hr>
+						<label class="label" for="ap_ssid">
+							<input type="text" class="card" name="ap_ssid" placeholder="Access point SSID">
+							<div class="label-text">Access point SSID</div>
+						</label>
+						<label class="label" for="ap_pwd">
+							<input type="password" class="card" name="ap_pwd" pattern=".{8,}" placeholder="Access point password">
+							<div class="label-text">Access point password</div>
 						</label>
 						<input type="submit" value="Save">
 					</form>

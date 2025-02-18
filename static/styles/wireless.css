@@ -8,3 +8,7 @@
 .container-wireless form {
 	margin: 45px auto;
 }
+
+.container-wireless form input[type="submit"] {
+	margin-top: 40px;
+}

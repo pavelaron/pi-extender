@@ -5,8 +5,8 @@ use rocket::{form::Form, http::{Cookie, CookieJar, Status}, response::Redirect, 
 use rocket_dyn_templates::{Template, context};
 use sysinfo::System;
 
-use crate::util::{
-  structs::{AuthenticatedUser, LoginInput},
+use super::{
+  structs::{AuthenticatedUser, LoginInput, WirelessInput},
   output_utils::{format_ferris, run_command},
   crypto_utils::{generate_token, hash_password, get_salt},
 };
@@ -54,6 +54,25 @@ pub fn status_page(_user: AuthenticatedUser) -> Template {
 #[get("/wireless-settings")]
 pub fn wireless(_user: AuthenticatedUser) -> Template {
   Template::render("wireless", context! {})
+}
+
+#[post["/save-wireless", data = "<wireless_input>"]]
+pub fn save_wireless(_user: AuthenticatedUser, wireless_input: Form<WirelessInput>) -> Redirect {
+  let data = sled::open("./data").unwrap();
+  let mut batch = sled::Batch::default();
+
+  batch.insert("source_ssid", wireless_input.source_ssid.as_str());
+  batch.insert("source_password", wireless_input.source_password.as_str());
+  batch.insert("ap_ssid", wireless_input.ap_ssid.as_str());
+  batch.insert("ap_password", wireless_input.ap_password.as_str());
+
+  data
+    .apply_batch(batch)
+    .expect("Failed to save wireless settings");
+
+  run_command("reboot -h now");
+
+  Redirect::to("/")
 }
 
 #[post("/", data = "<login_input>")]
