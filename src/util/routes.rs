@@ -56,6 +56,13 @@ pub fn wireless(_user: AuthenticatedUser) -> Template {
   Template::render("wireless", context! {})
 }
 
+#[get("/credential-settings")]
+pub fn credential(user: AuthenticatedUser) -> Template {
+  Template::render("credential", context! {
+    username: user.user_id,
+  })
+}
+
 #[post["/save-wireless", data = "<wireless_input>"]]
 pub fn save_wireless(_user: AuthenticatedUser, wireless_input: Form<WirelessInput>) -> Redirect {
   let data = sled::open("./data").unwrap();
@@ -71,6 +78,35 @@ pub fn save_wireless(_user: AuthenticatedUser, wireless_input: Form<WirelessInpu
     .expect("Failed to save wireless settings");
 
   run_command("reboot -h now");
+
+  Redirect::to("/")
+}
+
+#[post["/save-credential", data = "<credential_input>"]]
+pub fn save_credential(
+  _user: AuthenticatedUser,
+  credential_input: Form<LoginInput>,
+  cookies: &CookieJar<'_>,
+) -> Redirect {
+  let data = sled::open("./data").unwrap();
+  let mut batch = sled::Batch::default();
+
+  let username = credential_input.username.as_str();
+  let password = credential_input.password.as_str();
+
+  batch.insert("username", username);
+  batch.insert("password", password);
+
+  data
+    .apply_batch(batch)
+    .expect("Failed to save credential settings");
+
+  let token_string = match generate_token(username) {
+    Ok(token) => Ok(token),
+    Err(_) => Err(Status::InternalServerError),
+  };
+
+  cookies.add(Cookie::new("token", token_string.unwrap()));
 
   Redirect::to("/")
 }

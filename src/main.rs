@@ -103,6 +103,8 @@ fn launch() -> Rocket<Build> {
       routes::status_page,
       routes::wireless,
       routes::save_wireless,
+      routes::credential,
+      routes::save_credential,
       routes::restart,
       routes::logout,
     ],
