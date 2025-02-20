@@ -1,4 +1,4 @@
-use std::env;
+use std::{env, str};
 use dotenv::dotenv;
 use rocket::{
   fs::{relative, FileServer},
@@ -27,7 +27,7 @@ use crate::util::{
     run_command,
     output,
   },
-  routes,
+  routes::*,
 };
 
 #[macro_use]
@@ -90,23 +90,35 @@ fn launch() -> Rocket<Build> {
   output("Initializing admin server...");
   dotenv().ok();
 
+  let data = sled::open("./data").unwrap();
+
+  if data.contains_key("source_ssid").unwrap() {
+    let ssid = data.get("source_ssid").unwrap().unwrap();
+    let pwd = data.get("source_password").unwrap().unwrap();
+
+    let str_ssid = str::from_utf8(ssid.as_ref()).unwrap();
+    let str_pwd = str::from_utf8(pwd.as_ref()).unwrap();
+
+    run_command(&format!("nmcli dev wifi connect {str_ssid} password \"{str_pwd}\""));
+  }
+
   run_command("nmcli con modify Hotspot wifi-sec.pmf disable");
   run_command("iptables -t nat -A PREROUTING -i wlan0 -p tcp --dport 80 -j REDIRECT --to-port 8000");
 
   rocket::build()
     .attach(Template::fairing())
-    .register("/", catchers![routes::login])
+    .register("/", catchers![login])
     .mount("/", FileServer::from(relative!("static")))
     .mount("/", routes![
-      routes::index,
-      routes::auth,
-      routes::status_page,
-      routes::wireless,
-      routes::save_wireless,
-      routes::credential,
-      routes::save_credential,
-      routes::restart,
-      routes::logout,
+      index,
+      auth,
+      status_page,
+      wireless,
+      save_wireless,
+      credential,
+      save_credential,
+      restart,
+      logout,
     ],
   )
 }
