@@ -8,7 +8,7 @@ use jsonwebtoken::{
   errors::Error,
 };
 use sled::Db;
-use crate::util::structs::Claims;
+use super::structs::Claims;
 
 pub fn get_salt(data: &Db) -> String {
   let key = "keys::SALT";

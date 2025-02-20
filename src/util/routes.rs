@@ -1,7 +1,12 @@
 use std::str;
 
 use local_ip_address::{list_afinet_netifas, local_ip};
-use rocket::{form::Form, http::{Cookie, CookieJar, Status}, response::Redirect, Request};
+use rocket::{
+  form::Form,
+  http::{Cookie, CookieJar, Status},
+  response::Redirect,
+  Request
+};
 use rocket_dyn_templates::{Template, context};
 use sysinfo::System;
 
@@ -53,6 +58,22 @@ pub fn status_page(_user: AuthenticatedUser) -> Template {
 
 #[get("/wireless-settings")]
 pub fn wireless(_user: AuthenticatedUser) -> Template {
+  let data = sled::open("./data").unwrap();
+
+  if data.contains_key("source_ssid").unwrap() {
+    let source_ssid = data.get("source_ssid").unwrap().unwrap();
+    let source_password = data.get("source_password").unwrap().unwrap();
+    let ap_ssid = data.get("ap_ssid").unwrap().unwrap();
+    let ap_password = data.get("ap_password").unwrap().unwrap();
+
+    return Template::render("wireless", context! {
+      source_ssid: str::from_utf8(source_ssid.as_ref()).unwrap(),
+      source_password: str::from_utf8(source_password.as_ref()).unwrap(),
+      ap_ssid: str::from_utf8(ap_ssid.as_ref()).unwrap(),
+      ap_password: str::from_utf8(ap_password.as_ref()).unwrap(),
+    });
+  }
+
   Template::render("wireless", context! {})
 }
 

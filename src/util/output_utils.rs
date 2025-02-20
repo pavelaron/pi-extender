@@ -1,4 +1,10 @@
-use std::{io::{stdout, BufWriter}, process::Command};
+use std::{
+  io::{
+    stdout,
+    BufWriter,
+  },
+  process::Command,
+};
 use ferris_says::say;
 
 pub fn output(message: &str) {
