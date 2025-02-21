@@ -23,7 +23,7 @@ pub fn index(_user: AuthenticatedUser) -> Template {
 
 #[catch(401)]
 pub fn login(_r: &Request) -> Template {
-  Template::render("login", context! { message: "FAIL" })
+  Template::render("login", context! {})
 }
 
 #[get("/status")]
@@ -98,6 +98,8 @@ pub fn save_wireless(_user: AuthenticatedUser, wireless_input: Form<WirelessInpu
     .apply_batch(batch)
     .expect("Failed to save wireless settings");
 
+  let _ = data.flush();
+
   run_command("reboot -h now");
 
   Redirect::to("/")
@@ -121,6 +123,8 @@ pub fn save_credential(
   data
     .apply_batch(batch)
     .expect("Failed to save credential settings");
+
+  let _ = data.flush();
 
   let token_string = match generate_token(username) {
     Ok(token) => Ok(token),

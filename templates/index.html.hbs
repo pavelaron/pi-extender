@@ -26,17 +26,24 @@
 						<img src="/images/ic_wireless.png" alt="Wireless settings">
 						<div>Wireless settings</div>
 					</a>
-					<a href="/restart" class="card item">
+					<a
+						href="/restart"
+						class="card item"
+						onclick="return confirm('Are you sure you want to restart?')"
+					>
 						<img src="/images/ic_restart.png" alt="Restart">
 						<div>Restart</div>
 					</a>
-					<a href="/logout" class="card item">
+					<a
+						href="/logout"
+						class="card item"
+						onclick="return confirm('Are you sure you want to logout?')"
+					>
 						<img src="/images/ic_logout.png" alt="Logout">
 						<div>Logout</div>
 					</a>
 				</div>
 			</div>
 		</div>
-		<script type="text/javascript" src="/scripts/main.js"></script>
 	</body>
 </html>
