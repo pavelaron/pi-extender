@@ -11,9 +11,9 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Cargo cache
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: |
             ~/.cargo/registry
@@ -41,9 +41,9 @@ jobs:
       TARGET: ${{ matrix.TARGET }}
       OS: ${{ matrix.OS }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Cargo cache
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: |
             ~/.cargo/registry
@@ -89,7 +89,7 @@ jobs:
           mv ./target/$TARGET/release/$EXEC ./$EXEC
           tar -czf ./artifacts/$NAME-$TARGET-$TAG.tar.gz $EXEC
       - name: Archive artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: result
           path: |
