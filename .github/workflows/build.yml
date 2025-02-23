@@ -102,13 +102,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: pi-extender-${{matrix.TARGET}}
           path: ./artifacts
       - name: List
         run: find ./artifacts
       - name: Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           files: ./artifacts/*.tar.gz
