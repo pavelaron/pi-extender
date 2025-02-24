@@ -14,3 +14,7 @@
 .info-item {
 	margin-bottom: 30px;
 }
+
+.info-item h3 {
+	text-decoration: underline;
+}
