@@ -1,0 +1,15 @@
+{
+  "name": "Pi Extender",
+  "short_name": "Pi Extender",
+  "icons": [
+    {
+      "src": "/images/app-icons/web/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff"
+}
