@@ -1,0 +1,10 @@
+.container-error {
+	min-width: 300px;
+	margin: auto 10px;
+	padding: 30px;
+}
+
+.message-error {
+	display: flex;
+	justify-content: center;
+}

@@ -5,14 +5,14 @@ use rocket::{
   form::Form,
   http::{Cookie, CookieJar, Status},
   response::Redirect,
-  Request
+  Request,
 };
 use rocket_dyn_templates::{Template, context};
 use sysinfo::System;
 
 use super::{
   structs::{AuthenticatedUser, LoginInput, WirelessInput},
-  output_utils::{format_ferris, run_command},
+  output_utils::{format_ferris, run_command, error_context},
   crypto_utils::{generate_token, hash_password, get_salt},
 };
 
@@ -24,6 +24,16 @@ pub fn index(_user: AuthenticatedUser) -> Template {
 #[catch(401)]
 pub fn login(_r: &Request) -> Template {
   Template::render("login", context! {})
+}
+
+#[catch(404)]
+pub fn not_found(_r: &Request) -> Template {
+  Template::render("error", error_context(404, "Page not found"))
+}
+
+#[catch(500)]
+pub fn internal_error(_r: &Request) -> Template {
+  Template::render("error", error_context(500, "Internal server error"))
 }
 
 #[get("/status")]

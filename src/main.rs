@@ -107,7 +107,11 @@ fn launch() -> Rocket<Build> {
 
   rocket::build()
     .attach(Template::fairing())
-    .register("/", catchers![login])
+    .register("/", catchers![
+      login,
+      not_found,
+      internal_error,
+    ])
     .mount("/", FileServer::from(relative!("static")))
     .mount("/", routes![
       index,
