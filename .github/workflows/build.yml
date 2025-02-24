@@ -62,9 +62,9 @@ jobs:
           # some additional configuration for cross-compilation on linux
           cat >>~/.cargo/config <<EOF
           [target.armv7-unknown-linux-gnueabihf]
-          linker = "rust-lld"
+          linker = "arm-linux-gnueabihf-gcc"
           [target.arm-unknown-linux-gnueabihf]
-          linker = "rust-lld"
+          linker = "arm-linux-gnueabihf-gcc"
           EOF
       - name: Install rust target
         run: rustup target add $TARGET
