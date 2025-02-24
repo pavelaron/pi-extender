@@ -30,9 +30,9 @@ jobs:
       matrix:
         # a list of all the targets
         include:
-          - TARGET: armv7-unknown-linux-gnueabihf
+          - TARGET: armv7-unknown-linux-musleabihf
             OS: ubuntu-latest
-          - TARGET: arm-unknown-linux-gnueabihf
+          - TARGET: arm-unknown-linux-musleabihf
             OS: ubuntu-latest
     needs: test
     runs-on: ${{ matrix.OS }}
@@ -61,10 +61,10 @@ jobs:
 
           # some additional configuration for cross-compilation on linux
           cat >>~/.cargo/config <<EOF
-          [target.armv7-unknown-linux-gnueabihf]
-          linker = "arm-linux-gnueabihf-gcc"
-          [target.arm-unknown-linux-gnueabihf]
-          linker = "arm-linux-gnueabihf-gcc"
+          [target.armv7-unknown-linux-musleabihf]
+          linker = "rust-lld"
+          [target.arm-unknown-linux-musleabihf]
+          linker = "rust-lld"
           EOF
       - name: Install rust target
         run: rustup target add $TARGET
