@@ -40,5 +40,7 @@ pub fn run_command(cmd: &str) {
   }
 
   let mut execute = Command::new(cmd);
-  execute.status().expect("process failed to execute");
+  execute
+    .status()
+    .expect(format!("Process failed to execute: {cmd}\nError").as_str());
 }
