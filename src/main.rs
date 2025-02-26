@@ -1,13 +1,13 @@
 use std::{env, str};
 use dotenv::dotenv;
 use rocket::{
-  fs::{relative, FileServer},
   http::{Cookie, Status},
   request::{FromRequest, Outcome, Request},
   Build,
   Rocket,
 };
 use rocket_dyn_templates::Template;
+use rocket_include_dir::{include_dir, Dir, StaticFiles};
 use chrono::Utc;
 use jsonwebtoken::{
   decode,
@@ -117,8 +117,10 @@ fn launch() -> Rocket<Build> {
     "-p", "tcp",
     "--dport", "80",
     "-j", "REDIRECT",
-    "--to-port 8000",
+    "--to-port", "8000",
   ]);
+
+  static PROJECT_DIR: Dir = include_dir!("static");
 
   rocket::build()
     .attach(Template::fairing())
@@ -127,7 +129,7 @@ fn launch() -> Rocket<Build> {
       not_found,
       internal_error,
     ])
-    .mount("/", FileServer::from(relative!("static")))
+    .mount("/", StaticFiles::from(&PROJECT_DIR))
     .mount("/", routes![
       index,
       auth,

@@ -10,9 +10,11 @@ ferris-says = "0.3.2"
 hsh = "0.0.8"
 vrd = "0.0.8"
 serde = { version = "1.0.209", features = ["derive"] }
+include_dir = { version = "0.7.4", default-features = false }
 rocket = { version = "0.5.1", features = ["json"] }
 rocket-jwt = "0.5.2"
 rocket_dyn_templates = { version = "0.2.0", features = ["handlebars"] }
+rocket-include-dir = "1.1.0"
 sled = "0.34.7"
 chrono = "0.4.39"
 jsonwebtoken = "9.3.0"

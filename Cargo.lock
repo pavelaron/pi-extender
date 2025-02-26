@@ -856,6 +856,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "include_dir"
+version = "0.7.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "923d117408f1e49d914f1a379a309cffe4f18c05cf4e3d12e613a15fc81bd0dd"
+dependencies = [
+ "include_dir_macros",
+]
+
+[[package]]
+name = "include_dir_macros"
+version = "0.7.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7cab85a7ed0bd5f0e76d93846e0147172bed2e2d3f859bcc33a8d9699cad1a75"
+dependencies = [
+ "proc-macro2",
+ "quote",
+]
+
+[[package]]
 name = "indexmap"
 version = "2.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1449,9 +1468,11 @@ dependencies = [
  "dotenv",
  "ferris-says",
  "hsh",
+ "include_dir",
  "jsonwebtoken 9.3.0",
  "local-ip-address",
  "rocket",
+ "rocket-include-dir",
  "rocket-jwt",
  "rocket_dyn_templates",
  "serde",
@@ -1744,6 +1765,16 @@ dependencies = [
  "ubyte",
  "version_check",
  "yansi 1.0.1",
+]
+
+[[package]]
+name = "rocket-include-dir"
+version = "1.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "abee13f8b33f1c2ab0cbb0fdfbd6e474dbdfa8ea77c0d5384af969b0e7a87c8c"
+dependencies = [
+ "include_dir",
+ "rocket",
 ]
 
 [[package]]
