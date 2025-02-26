@@ -110,7 +110,7 @@ pub fn save_wireless(_user: AuthenticatedUser, wireless_input: Form<WirelessInpu
 
   let _ = data.flush();
 
-  run_command("reboot -h now");
+  run_command("reboot", &["-h", "now"]);
 
   Redirect::to("/")
 }
@@ -187,6 +187,6 @@ pub fn logout(_user: AuthenticatedUser, cookies: &CookieJar<'_>) -> Redirect {
 
 #[get("/restart")]
 pub fn restart(_user: AuthenticatedUser) -> Redirect {
-  run_command("reboot -h now");
+  run_command("reboot", &["-h", "now"]);
   Redirect::to("/")
 }

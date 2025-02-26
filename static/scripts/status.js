@@ -1,7 +1,7 @@
 (function() {
   var bootMeta = document
     .querySelector("meta[name='boot_time']")
-    .getAttribute("content");
+    .getAttribute('content');
 
   setInterval(function() {
     var now = new Date();
@@ -12,6 +12,6 @@
       + elapsed.getUTCMinutes() + ' minutes '
       + elapsed.getUTCSeconds() + ' seconds';
 
-    document.getElementById("uptime").innerHTML = readable;
+    document.getElementById('uptime').innerHTML = readable;
   }, 1000);
 })();

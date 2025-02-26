@@ -32,15 +32,16 @@ pub fn error_context(code: u16, message: &str) -> ErrorContext {
   }
 }
 
-pub fn run_command(cmd: &str) {
-  println!("Running command: {}", cmd);
+pub fn run_command(cmd: &str, args: &[&str]) {
+  let full_command = format!("{} {}", cmd, args.join(" "));
+  println!("Running command: {}", full_command);
 
   if cfg!(debug_assertions) {
     return;
   }
 
-  let mut execute = Command::new(cmd);
-  execute
+  Command::new(cmd)
+    .args(args)
     .status()
-    .expect(format!("Process failed to execute: {cmd}\nError").as_str());
+    .expect(format!("Process failed to execute: {full_command}\nError").as_str());
 }

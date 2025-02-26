@@ -99,11 +99,26 @@ fn launch() -> Rocket<Build> {
     let str_ssid = str::from_utf8(ssid.as_ref()).unwrap();
     let str_pwd = str::from_utf8(pwd.as_ref()).unwrap();
 
-    run_command(&format!("nmcli dev wifi connect {str_ssid} password \"{str_pwd}\""));
+    run_command("nmcli", &[
+      "dev",
+      "wifi",
+      "connect",
+      &format!("\"{str_ssid}\""),
+      "password",
+      &format!("\"{str_pwd}\""),
+    ]);
   }
 
-  run_command("nmcli con modify Hotspot wifi-sec.pmf disable");
-  run_command("iptables -t nat -A PREROUTING -i wlan0 -p tcp --dport 80 -j REDIRECT --to-port 8000");
+  run_command("nmcli", &["con", "modify", "Hotspot", "wifi-sec.pmf", "disable"]);
+  run_command("iptables", &[
+    "-t", "nat",
+    "-A", "PREROUTING",
+    "-i", "wlan0",
+    "-p", "tcp",
+    "--dport", "80",
+    "-j", "REDIRECT",
+    "--to-port 8000",
+  ]);
 
   rocket::build()
     .attach(Template::fairing())
