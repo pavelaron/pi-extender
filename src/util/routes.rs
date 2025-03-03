@@ -13,24 +13,30 @@ use sysinfo::System;
 
 use super::{
   crypto_utils::{generate_token, get_salt, hash_password},
-  output_utils::{format_ferris, run_command},
+  output_utils::{format_ferris, get_pwa_headers, run_command},
   structs::{AuthenticatedUser, LoginInput, WirelessInput},
 };
 
 #[get("/")]
 pub fn index(
-  _user: AuthenticatedUser,
+  user: AuthenticatedUser,
   handlebars_cm: &State<HandlebarsContextManager>,
   etag_if_none_match: EtagIfNoneMatch,
 ) -> HandlebarsResponse {
-  let map: HashMap<String, String> = HashMap::new();
+  let map: HashMap<&str, String> = HashMap::from([
+    ("pwa_headers", user.pwa_headers),
+  ]);
+
   handlebars_response!(handlebars_cm, etag_if_none_match, "index", map)
 }
 
 #[catch(401)]
 pub fn login(req: &Request) -> RawHtml<String> {
   let context_manager = req.rocket().state::<HandlebarsContextManager>().unwrap();
-  let map: HashMap<String, String> = HashMap::new();
+  let map: HashMap<&str, String> = HashMap::from([
+    ("pwa_headers", get_pwa_headers(req)),
+  ]);
+
   let rendered_html = context_manager.render("login", map);
 
   RawHtml(rendered_html)
@@ -40,6 +46,7 @@ pub fn login(req: &Request) -> RawHtml<String> {
 pub fn default_error(status: Status, req: &Request) -> RawHtml<String> {
   let context_manager = req.rocket().state::<HandlebarsContextManager>().unwrap();
   let context = HashMap::from([
+    ("pwa_headers", get_pwa_headers(req)),
     ("status", status.code.to_string()),
     ("message", format_ferris(&status.reason().unwrap())),
   ]);
@@ -51,7 +58,7 @@ pub fn default_error(status: Status, req: &Request) -> RawHtml<String> {
 
 #[get("/status")]
 pub fn status_page(
-  _user: AuthenticatedUser,
+  user: AuthenticatedUser,
   handlebars_cm: &State<HandlebarsContextManager>,
   etag_if_none_match: EtagIfNoneMatch,
 ) -> HandlebarsResponse {
@@ -73,6 +80,7 @@ pub fn status_page(
     );
 
   let map: HashMap<&str, String> = HashMap::from([
+    ("pwa_headers", user.pwa_headers),
     ("response", response_str),
     ("boot_time", format!("{}", boot)),
     ("load_avg", format!("{:?}%", load_avg.five)),
@@ -87,30 +95,30 @@ pub fn status_page(
 
 #[get("/wireless-settings")]
 pub fn wireless(
-  _user: AuthenticatedUser,
+  user: AuthenticatedUser,
   handlebars_cm: &State<HandlebarsContextManager>,
   etag_if_none_match: EtagIfNoneMatch,
 ) -> HandlebarsResponse {
   let data = sled::open("./data").unwrap();
 
-  if !data.contains_key("source_ssid").unwrap() {
-    let empty_map: HashMap<&str, &str> = HashMap::new();
+  let mut map: HashMap<&str, &str> = HashMap::from([
+    ("pwa_headers", user.pwa_headers.as_str()),
+  ]);
 
-    return handlebars_response!(handlebars_cm, etag_if_none_match, "wireless", empty_map);
+  if !data.contains_key("source_ssid").unwrap() {
+    return handlebars_response!(handlebars_cm, etag_if_none_match, "wireless", map);
   }
 
   let source_ssid = data.get("source_ssid").unwrap().unwrap();
   let source_password = data.get("source_password").unwrap().unwrap();
   let ap_ssid = data.get("ap_ssid").unwrap().unwrap();
-  let ap_password = data.get("ap_password").unwrap().unwrap();
-  
-  let map = HashMap::from([
-    ("source_ssid", str::from_utf8(source_ssid.as_ref()).unwrap()),
-    ("source_password", str::from_utf8(source_password.as_ref()).unwrap()),
-    ("ap_ssid", str::from_utf8(ap_ssid.as_ref()).unwrap()),
-    ("ap_password", str::from_utf8(ap_password.as_ref()).unwrap()),
-  ]);
-    
+  let ap_password: sled::IVec = data.get("ap_password").unwrap().unwrap();
+
+  map.insert("source_ssid", str::from_utf8(source_ssid.as_ref()).unwrap());
+  map.insert("source_password", str::from_utf8(source_password.as_ref()).unwrap());
+  map.insert("ap_ssid", str::from_utf8(ap_ssid.as_ref()).unwrap());
+  map.insert("ap_password", str::from_utf8(ap_password.as_ref()).unwrap());
+
   handlebars_response!(handlebars_cm, etag_if_none_match, "wireless", map)
 }
 
@@ -120,8 +128,9 @@ pub fn credential(
   handlebars_cm: &State<HandlebarsContextManager>,
   etag_if_none_match: EtagIfNoneMatch,
 ) -> HandlebarsResponse {
-  let map: HashMap<String, String> = HashMap::from([
-    ("username".to_string(), user.user_id),
+  let map: HashMap<&str, String> = HashMap::from([
+    ("username", user.user_id),
+    ("pwa_headers", user.pwa_headers),
   ]);
 
   handlebars_response!(handlebars_cm, etag_if_none_match, "credential", map)

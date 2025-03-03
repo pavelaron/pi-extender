@@ -11,6 +11,7 @@ pub struct Claims {
 // Auth guard for protected routes
 pub struct AuthenticatedUser {
   pub user_id: String,
+  pub pwa_headers: String,
 }
 
 #[derive(FromForm)]

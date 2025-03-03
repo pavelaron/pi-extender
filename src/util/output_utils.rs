@@ -1,5 +1,8 @@
 use ferris_says::say;
+use rocket::{response::content::RawHtml, Request};
+use rocket_include_handlebars::HandlebarsContextManager;
 use std::{
+  collections::HashMap,
   io::{stdout, BufWriter},
   process::Command,
 };
@@ -36,4 +39,12 @@ pub fn run_command(cmd: &str, args: &[&str]) {
     .args(args)
     .status()
     .expect(format!("Process failed to execute: {full_command}\nError").as_str());
+}
+
+pub fn get_pwa_headers(req: &Request) -> String {
+  let context_manager = req.rocket().state::<HandlebarsContextManager>().unwrap();
+  let headers: HashMap<String, String> = HashMap::new();
+  let rendered_headers = context_manager.render("pwa", headers);
+
+  RawHtml(rendered_headers).0
 }
