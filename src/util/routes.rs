@@ -1,43 +1,60 @@
-use std::str;
+use std::{collections::HashMap, str};
 
 use local_ip_address::{list_afinet_netifas, local_ip};
 use rocket::{
   form::Form,
   http::{Cookie, CookieJar, Status},
-  response::Redirect,
+  response::{content::RawHtml, Redirect},
   Request,
+  State,
 };
-use rocket_dyn_templates::{Template, context};
+use rocket_include_handlebars::{EtagIfNoneMatch, HandlebarsContextManager, HandlebarsResponse};
 use sysinfo::System;
 
 use super::{
+  crypto_utils::{generate_token, get_salt, hash_password},
+  output_utils::{format_ferris, run_command},
   structs::{AuthenticatedUser, LoginInput, WirelessInput},
-  output_utils::{format_ferris, run_command, error_context},
-  crypto_utils::{generate_token, hash_password, get_salt},
 };
 
 #[get("/")]
-pub fn index(_user: AuthenticatedUser) -> Template {
-  Template::render("index", context! {})
+pub fn index(
+  _user: AuthenticatedUser,
+  handlebars_cm: &State<HandlebarsContextManager>,
+  etag_if_none_match: EtagIfNoneMatch,
+) -> HandlebarsResponse {
+  let map: HashMap<String, String> = HashMap::new();
+  handlebars_response!(handlebars_cm, etag_if_none_match, "index", map)
 }
 
 #[catch(401)]
-pub fn login(_r: &Request) -> Template {
-  Template::render("login", context! {})
+pub fn login(req: &Request) -> RawHtml<String> {
+  let context_manager = req.rocket().state::<HandlebarsContextManager>().unwrap();
+  let map: HashMap<String, String> = HashMap::new();
+  let rendered_html = context_manager.render("login", map);
+
+  RawHtml(rendered_html)
 }
 
-#[catch(404)]
-pub fn not_found(_r: &Request) -> Template {
-  Template::render("error", error_context(404, "Page not found"))
-}
+#[catch(default)]
+pub fn default_error(status: Status, req: &Request) -> RawHtml<String> {
+  let context_manager = req.rocket().state::<HandlebarsContextManager>().unwrap();
+  let context = HashMap::from([
+    ("status", status.code.to_string()),
+    ("message", format_ferris(&status.reason().unwrap())),
+  ]);
 
-#[catch(500)]
-pub fn internal_error(_r: &Request) -> Template {
-  Template::render("error", error_context(500, "Internal server error"))
+  let rendered_html = context_manager.render("error", context);
+
+  RawHtml(rendered_html)
 }
 
 #[get("/status")]
-pub fn status_page(_user: AuthenticatedUser) -> Template {
+pub fn status_page(
+  _user: AuthenticatedUser,
+  handlebars_cm: &State<HandlebarsContextManager>,
+  etag_if_none_match: EtagIfNoneMatch,
+) -> HandlebarsResponse {
   let system = System::new_all();
 
   let response_str = format_ferris("Repeater is up and running!");
@@ -55,43 +72,59 @@ pub fn status_page(_user: AuthenticatedUser) -> Template {
       |acc: String, (name, ip)| format!("{}{}:\t{:?}\n", acc, name, ip),
     );
 
-  Template::render("status", context! {
-    response: response_str,
-    boot_time: format!("{}", boot),
-    load_avg: format!("{:?}%", load_avg.five),
-    memory: format!("{:?} of {:?} bytes", free_mem, total_mem),
-    hostname: hostname,
-    local_ip: ip,
-    interfaces: network_interfaces,
-  })
+  let map: HashMap<&str, String> = HashMap::from([
+    ("response", response_str),
+    ("boot_time", format!("{}", boot)),
+    ("load_avg", format!("{:?}%", load_avg.five)),
+    ("memory", format!("{:?} of {:?} bytes", free_mem, total_mem)),
+    ("hostname", hostname.unwrap()),
+    ("local_ip", ip.to_string()),
+    ("interfaces", network_interfaces),
+  ]);
+
+  handlebars_response!(handlebars_cm, etag_if_none_match, "status", map)
 }
 
 #[get("/wireless-settings")]
-pub fn wireless(_user: AuthenticatedUser) -> Template {
+pub fn wireless(
+  _user: AuthenticatedUser,
+  handlebars_cm: &State<HandlebarsContextManager>,
+  etag_if_none_match: EtagIfNoneMatch,
+) -> HandlebarsResponse {
   let data = sled::open("./data").unwrap();
 
-  if data.contains_key("source_ssid").unwrap() {
-    let source_ssid = data.get("source_ssid").unwrap().unwrap();
-    let source_password = data.get("source_password").unwrap().unwrap();
-    let ap_ssid = data.get("ap_ssid").unwrap().unwrap();
-    let ap_password = data.get("ap_password").unwrap().unwrap();
+  if !data.contains_key("source_ssid").unwrap() {
+    let empty_map: HashMap<&str, &str> = HashMap::new();
 
-    return Template::render("wireless", context! {
-      source_ssid: str::from_utf8(source_ssid.as_ref()).unwrap(),
-      source_password: str::from_utf8(source_password.as_ref()).unwrap(),
-      ap_ssid: str::from_utf8(ap_ssid.as_ref()).unwrap(),
-      ap_password: str::from_utf8(ap_password.as_ref()).unwrap(),
-    });
+    return handlebars_response!(handlebars_cm, etag_if_none_match, "wireless", empty_map);
   }
 
-  Template::render("wireless", context! {})
+  let source_ssid = data.get("source_ssid").unwrap().unwrap();
+  let source_password = data.get("source_password").unwrap().unwrap();
+  let ap_ssid = data.get("ap_ssid").unwrap().unwrap();
+  let ap_password = data.get("ap_password").unwrap().unwrap();
+  
+  let map = HashMap::from([
+    ("source_ssid", str::from_utf8(source_ssid.as_ref()).unwrap()),
+    ("source_password", str::from_utf8(source_password.as_ref()).unwrap()),
+    ("ap_ssid", str::from_utf8(ap_ssid.as_ref()).unwrap()),
+    ("ap_password", str::from_utf8(ap_password.as_ref()).unwrap()),
+  ]);
+    
+  handlebars_response!(handlebars_cm, etag_if_none_match, "wireless", map)
 }
 
 #[get("/credential-settings")]
-pub fn credential(user: AuthenticatedUser) -> Template {
-  Template::render("credential", context! {
-    username: user.user_id,
-  })
+pub fn credential(
+  user: AuthenticatedUser,
+  handlebars_cm: &State<HandlebarsContextManager>,
+  etag_if_none_match: EtagIfNoneMatch,
+) -> HandlebarsResponse {
+  let map: HashMap<String, String> = HashMap::from([
+    ("username".to_string(), user.user_id),
+  ]);
+
+  handlebars_response!(handlebars_cm, etag_if_none_match, "credential", map)
 }
 
 #[post["/save-wireless", data = "<wireless_input>"]]

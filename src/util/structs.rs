@@ -31,10 +31,3 @@ pub struct WirelessInput {
 pub struct TokenResponse {
   token: String,
 }
-
-#[derive(Serialize)]
-#[serde(crate = "rocket::serde")]
-pub struct ErrorContext {
-  pub status: u16,
-  pub message: String,
-}

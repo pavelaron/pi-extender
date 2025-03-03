@@ -8,6 +8,7 @@ use rocket::{
 };
 use rocket_dyn_templates::Template;
 use rocket_include_dir::{include_dir, Dir, StaticFiles};
+use rocket_include_handlebars::HandlebarsResponse;
 use chrono::Utc;
 use jsonwebtoken::{
   decode,
@@ -32,6 +33,9 @@ use crate::util::{
 
 #[macro_use]
 extern crate rocket;
+
+#[macro_use]
+extern crate rocket_include_handlebars;
 
 #[rocket::async_trait]
 impl<'r> FromRequest<'r> for AuthenticatedUser {
@@ -124,10 +128,20 @@ fn launch() -> Rocket<Build> {
 
   rocket::build()
     .attach(Template::fairing())
+    .attach(HandlebarsResponse::fairing(|handlebars| {
+      handlebars_resources_initialize!(
+        handlebars,
+        "index" => "templates/index.html.hbs",
+        "wireless" => "templates/wireless.html.hbs",
+        "error" => "templates/error.html.hbs",
+        "login" => "templates/login.html.hbs",
+        "status" => "templates/status.html.hbs",
+        "credential" => "templates/credential.html.hbs",
+      );
+    }))
     .register("/", catchers![
       login,
-      not_found,
-      internal_error,
+      default_error,
     ])
     .mount("/", StaticFiles::from(&PROJECT_DIR))
     .mount("/", routes![

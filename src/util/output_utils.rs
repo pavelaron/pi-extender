@@ -1,9 +1,8 @@
+use ferris_says::say;
 use std::{
   io::{stdout, BufWriter},
   process::Command,
 };
-use ferris_says::say;
-use super::structs::ErrorContext;
 
 pub fn output(message: &str) {
   let stdout = stdout();
@@ -23,13 +22,6 @@ pub fn format_ferris(message: &str) -> String {
   let output = writer.into_inner().unwrap();
 
   String::from_utf8(output).unwrap()
-}
-
-pub fn error_context(code: u16, message: &str) -> ErrorContext {
-  ErrorContext {
-    status: code,
-    message: format_ferris(&message),
-  }
 }
 
 pub fn run_command(cmd: &str, args: &[&str]) {
