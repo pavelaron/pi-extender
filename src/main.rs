@@ -129,7 +129,6 @@ fn launch() -> Rocket<Build> {
   static STATIC_DIR: Dir = include_dir!("static");
 
   rocket::build()
-    // .attach(Template::fairing())
     .attach(HandlebarsResponse::fairing(|handlebars| {
       handlebars_resources_initialize!(
         handlebars,
