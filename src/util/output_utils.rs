@@ -1,11 +1,11 @@
 use ferris_says::say;
-use rocket::{response::content::RawHtml, Request};
-use rocket_include_handlebars::HandlebarsContextManager;
+use rocket_dyn_templates:: handlebars::Handlebars;
 use std::{
-  collections::HashMap,
   io::{stdout, BufWriter},
   process::Command,
 };
+
+const PWA_TEMPLATE: &str = include_str!("../.././templates/includes/pwa.hbs");
 
 pub fn output(message: &str) {
   let stdout = stdout();
@@ -41,10 +41,15 @@ pub fn run_command(cmd: &str, args: &[&str]) {
     .expect(format!("Process failed to execute: {full_command}\nError").as_str());
 }
 
-pub fn get_pwa_headers(req: &Request) -> String {
-  let context_manager = req.rocket().state::<HandlebarsContextManager>().unwrap();
-  let headers: HashMap<String, String> = HashMap::new();
-  let rendered_headers = context_manager.render("pwa", headers);
+pub fn render_pwa_header() -> String {
+  let mut handlebars = Handlebars::new();
+  let template_name = "pwa_header";
 
-  RawHtml(rendered_headers).0
+  // Register the template with a name
+  handlebars.register_template_string(template_name, PWA_TEMPLATE)
+    .expect("Failed to register template");
+  
+  // Render the template
+  handlebars.render(template_name, &())
+    .unwrap_or_else(|e| format!("Template rendering error: {}", e))
 }

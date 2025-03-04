@@ -13,7 +13,7 @@ use sysinfo::System;
 
 use super::{
   crypto_utils::{generate_token, get_salt, hash_password},
-  output_utils::{format_ferris, get_pwa_headers, run_command},
+  output_utils::{format_ferris, render_pwa_header, run_command},
   structs::{AuthenticatedUser, LoginInput, WirelessInput},
 };
 
@@ -34,7 +34,7 @@ pub fn index(
 pub fn login(req: &Request) -> RawHtml<String> {
   let context_manager = req.rocket().state::<HandlebarsContextManager>().unwrap();
   let map: HashMap<&str, String> = HashMap::from([
-    ("pwa_headers", get_pwa_headers(req)),
+    ("pwa_headers", render_pwa_header()),
   ]);
 
   let rendered_html = context_manager.render("login", map);
@@ -46,7 +46,7 @@ pub fn login(req: &Request) -> RawHtml<String> {
 pub fn default_error(status: Status, req: &Request) -> RawHtml<String> {
   let context_manager = req.rocket().state::<HandlebarsContextManager>().unwrap();
   let context = HashMap::from([
-    ("pwa_headers", get_pwa_headers(req)),
+    ("pwa_headers", render_pwa_header()),
     ("status", status.code.to_string()),
     ("message", format_ferris(&status.reason().unwrap())),
   ]);

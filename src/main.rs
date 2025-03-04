@@ -27,7 +27,7 @@ use crate::util::{
   output_utils::{
     run_command,
     output,
-    get_pwa_headers,
+    render_pwa_header,
   },
   routes::*,
 };
@@ -44,7 +44,7 @@ impl<'r> FromRequest<'r> for AuthenticatedUser {
 
   async fn from_request(request: &'r Request<'_>) -> Outcome<Self, Self::Error> {
     let cookies = request.cookies().get("token");
-    let pwa_headers = get_pwa_headers(request);
+    let pwa_headers = render_pwa_header();
 
     let token = match cookies {
       Some(token) => token.value(),
@@ -134,13 +134,12 @@ fn launch() -> Rocket<Build> {
     .attach(HandlebarsResponse::fairing(|handlebars| {
       handlebars_resources_initialize!(
         handlebars,
-        "index" => "templates/index.html.hbs",
-        "wireless" => "templates/wireless.html.hbs",
-        "error" => "templates/error.html.hbs",
-        "login" => "templates/login.html.hbs",
-        "status" => "templates/status.html.hbs",
-        "credential" => "templates/credential.html.hbs",
-        "pwa" => "templates/includes/pwa.hbs",
+        "index"       => "templates/index.html.hbs",
+        "wireless"    => "templates/wireless.html.hbs",
+        "error"       => "templates/error.html.hbs",
+        "login"       => "templates/login.html.hbs",
+        "status"      => "templates/status.html.hbs",
+        "credential"  => "templates/credential.html.hbs",
       );
     }))
     .register("/", catchers![
