@@ -6,7 +6,6 @@ use rocket::{
   Build,
   Rocket,
 };
-use rocket_dyn_templates::{handlebars::Handlebars, Template};
 use rocket_include_dir::{include_dir, Dir, StaticFiles};
 use rocket_include_handlebars::HandlebarsResponse;
 use chrono::Utc;
@@ -128,55 +127,36 @@ fn launch() -> Rocket<Build> {
   ]);
 
   static STATIC_DIR: Dir = include_dir!("static");
-  static TEMPLATES_DIR: Dir = include_dir!("templates");
-
-  fn create_handlebars_engine() -> Handlebars<'static> {
-      let mut handlebars = Handlebars::new();
-
-      for file in TEMPLATES_DIR.files() {
-          if let Some(name) = file.path().file_stem() {
-              if let Ok(template_content) = str::from_utf8(file.contents()) {
-                  handlebars.register_template_string(
-                      name.to_str().unwrap(), 
-                      template_content
-                  ).expect("Failed to register template");
-              }
-          }
-      }
-
-      handlebars
-  }
 
   rocket::build()
-  .attach(Template::fairing())
-  .attach(HandlebarsResponse::fairing(|handlebars| {
-    handlebars_resources_initialize!(
-      handlebars,
-      "index"       => "templates/index.html.hbs",
-      "wireless"    => "templates/wireless.html.hbs",
-      "error"       => "templates/error.html.hbs",
-      "login"       => "templates/login.html.hbs",
-      "status"      => "templates/status.html.hbs",
-      "credential"  => "templates/credential.html.hbs",
-      "pwa"         => "templates/includes/pwa.hbs",
-      );
-    }))
-    .register("/", catchers![
-      login,
-      default_error,
-    ])
-    .manage(create_handlebars_engine())
-    .mount("/", StaticFiles::from(&STATIC_DIR))
-    .mount("/", routes![
-      index,
-      auth,
-      status_page,
-      wireless,
-      save_wireless,
-      credential,
-      save_credential,
-      restart,
-      logout,
-    ],
+    // .attach(Template::fairing())
+    .attach(HandlebarsResponse::fairing(|handlebars| {
+      handlebars_resources_initialize!(
+        handlebars,
+        "index"       => "templates/index.html.hbs",
+        "wireless"    => "templates/wireless.html.hbs",
+        "error"       => "templates/error.html.hbs",
+        "login"       => "templates/login.html.hbs",
+        "status"      => "templates/status.html.hbs",
+        "credential"  => "templates/credential.html.hbs",
+        "pwa"         => "templates/headers.hbs",
+        );
+      }))
+      .register("/", catchers![
+        login,
+        default_error,
+      ])
+      .mount("/", StaticFiles::from(&STATIC_DIR))
+      .mount("/", routes![
+        index,
+        auth,
+        status_page,
+        wireless,
+        save_wireless,
+        credential,
+        save_credential,
+        restart,
+        logout,
+      ],
   )
 }
