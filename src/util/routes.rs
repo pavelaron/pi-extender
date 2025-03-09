@@ -1,5 +1,4 @@
-use std::{collections::HashMap, str};
-
+use std::{collections::HashMap, process::Command, str};
 use local_ip_address::{list_afinet_netifas, local_ip};
 use rocket::{
   form::Form,
@@ -79,12 +78,19 @@ pub fn status_page(
       |acc: String, (name, ip)| format!("{}{}:\t{:?}\n", acc, name, ip),
     );
 
+  let output = Command::new("iwgetid")
+    .output()
+    .expect("Process failed to execute: iwgetid\nError");
+
+  let source_ap = String::from_utf8(output.stdout).unwrap();
+
   let map: HashMap<&str, String> = HashMap::from([
     ("pwa_headers",   user.pwa_headers),
     ("response",      response_str),
     ("boot_time",     format!("{}", boot)),
     ("load_avg",      format!("{:?}%", load_avg.five)),
     ("memory",        format!("{:?} of {:?} bytes", free_mem, total_mem)),
+    ("source_ap",     source_ap),
     ("hostname",      hostname.unwrap()),
     ("local_ip",      ip.to_string()),
     ("interfaces",    network_interfaces),

@@ -60,8 +60,6 @@ impl<'r> FromRequest<'r> for AuthenticatedUser {
       &validation,
     ) {
       Ok(token_data) => {
-        println!("Token data: {:#?}", token_data);
-
         if token_data.claims.exp < Utc::now().timestamp() {
           return Outcome::Error((Status::Unauthorized, ()));
         }
