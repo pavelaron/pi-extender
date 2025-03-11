@@ -118,23 +118,27 @@ pub fn wireless(
 ) -> HandlebarsResponse {
   let data = sled::open("./data").unwrap();
 
-  let mut map: HashMap<&str, &str> = HashMap::from([
-    ("pwa_headers", user.pwa_headers.as_str()),
+  let mut map: HashMap<&str, String> = HashMap::from([
+    ("pwa_headers", user.pwa_headers),
   ]);
 
-  if !data.contains_key("source_ssid").unwrap() {
-    return handlebars_response!(handlebars_cm, etag_if_none_match, "wireless", map);
+  let keys = [
+    "source_ssid",
+    "source_password",
+    "ap_ssid",
+    "ap_password",
+  ];
+
+  for key in keys {
+    if !data.contains_key(key).unwrap() {
+      continue;
+    }
+
+    let value = data.get(key).unwrap().unwrap();
+    let str_value = String::from_utf8(value.to_vec()).unwrap();
+
+    map.insert(key, str_value);
   }
-
-  let source_ssid = data.get("source_ssid").unwrap().unwrap();
-  let source_password = data.get("source_password").unwrap().unwrap();
-  let ap_ssid = data.get("ap_ssid").unwrap().unwrap();
-  let ap_password: sled::IVec = data.get("ap_password").unwrap().unwrap();
-
-  map.insert("source_ssid", str::from_utf8(source_ssid.as_ref()).unwrap());
-  map.insert("source_password", str::from_utf8(source_password.as_ref()).unwrap());
-  map.insert("ap_ssid", str::from_utf8(ap_ssid.as_ref()).unwrap());
-  map.insert("ap_password", str::from_utf8(ap_password.as_ref()).unwrap());
 
   handlebars_response!(handlebars_cm, etag_if_none_match, "wireless", map)
 }
