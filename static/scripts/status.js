@@ -7,10 +7,16 @@
     var now = new Date();
     var elapsed = new Date(now - parseInt(bootMeta) * 1000);
 
-    var readable = (elapsed.getUTCDate() - 1) + ' days '
-      + elapsed.getUTCHours() + ' hours '
-      + elapsed.getUTCMinutes() + ' minutes '
-      + elapsed.getUTCSeconds() + ' seconds';
+    var readable = [
+      (elapsed.getUTCDate() - 1),
+      'days',
+      elapsed.getUTCHours(),
+      'hours',
+      elapsed.getUTCMinutes(),
+      'minutes',
+      elapsed.getUTCSeconds(),
+      'seconds'
+    ].join(' ');
 
     document.getElementById('uptime').innerHTML = readable;
   }, 1000);

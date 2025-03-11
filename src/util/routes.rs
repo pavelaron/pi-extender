@@ -1,4 +1,9 @@
-use std::{collections::HashMap, process::Command, str};
+use std::{
+  collections::HashMap,
+  os::unix::process::ExitStatusExt,
+  process::Command,
+  str,
+};
 use local_ip_address::{list_afinet_netifas, local_ip};
 use rocket::{
   form::Form,
@@ -80,7 +85,13 @@ pub fn status_page(
 
   let output = Command::new("iwgetid")
     .output()
-    .expect("Process failed to execute: iwgetid\nError");
+    .unwrap_or_else(|_| {
+      std::process::Output {
+        status: std::process::ExitStatus::from_raw(0),
+        stdout: "Not available".as_bytes().to_vec(),
+        stderr: Vec::new(),
+      }
+    });
 
   let source_ap = String::from_utf8(output.stdout).unwrap();
 
