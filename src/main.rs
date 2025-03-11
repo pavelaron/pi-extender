@@ -114,15 +114,6 @@ fn launch() -> Rocket<Build> {
   }
 
   run_command("nmcli", &["con", "modify", "Hotspot", "wifi-sec.pmf", "disable"]);
-  run_command("iptables", &[
-    "-t", "nat",
-    "-A", "PREROUTING",
-    "-i", "wlan0",
-    "-p", "tcp",
-    "--dport", "80",
-    "-j", "REDIRECT",
-    "--to-port", "8000",
-  ]);
 
   static STATIC_DIR: Dir = include_dir!("static");
 
@@ -138,22 +129,23 @@ fn launch() -> Rocket<Build> {
         "credential"  => "templates/credential.html.hbs",
         "pwa"         => "templates/headers.hbs",
         );
-      }))
-      .register("/", catchers![
-        login,
-        default_error,
-      ])
-      .mount("/", StaticFiles::from(&STATIC_DIR))
-      .mount("/", routes![
-        index,
-        auth,
-        status_page,
-        wireless,
-        save_wireless,
-        credential,
-        save_credential,
-        restart,
-        logout,
-      ],
+      })
+    )
+    .register("/", catchers![
+      login,
+      default_error,
+    ])
+    .mount("/", StaticFiles::from(&STATIC_DIR))
+    .mount("/", routes![
+      index,
+      auth,
+      status_page,
+      wireless,
+      save_wireless,
+      credential,
+      save_credential,
+      restart,
+      logout,
+    ],
   )
 }
