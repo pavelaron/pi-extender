@@ -108,3 +108,38 @@ hr {
 	opacity: 0.5;
 	margin: 20px auto;
 }
+
+@media (prefers-color-scheme: dark) {
+	html, body {
+		background-color: rgb(58, 68, 75);
+		color: white;
+	}
+
+	.card {
+		box-shadow: 0 1px 8px 0 rgba(0, 0, 0, 0.4)
+	}
+
+	.label .label-text {
+		color: rgba(255, 255, 255, 0.6);
+	}
+
+	.label input.card {
+		background-color: transparent;
+		color: white;
+		caret-color: rgba(255, 255, 255, 0.6);
+	}
+
+	.label input.card::placeholder {
+		color: rgba(255, 255, 255, 0.6);
+	}
+
+	.label input.card:-webkit-autofill,
+	.label input.card:-webkit-autofill:hover, 
+	.label input.card:-webkit-autofill:focus, 
+	.label input.card:-webkit-autofill:active {
+			-webkit-background-clip: text;
+			-webkit-text-fill-color: white;
+			transition: background-color 5000s ease-in-out 0s;
+			font-family: 'DepartureMono', monospace;
+	}
+}

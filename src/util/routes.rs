@@ -60,6 +60,11 @@ pub fn default_error(status: Status, req: &Request) -> RawHtml<String> {
   RawHtml(rendered_html)
 }
 
+#[get("/.well-known/appspecific/com.chrome.devtools.json")]
+pub fn devtools() -> RawHtml<String> {
+  RawHtml(String::from("{\"name\": \"Pi Extender\"}"))
+}
+
 #[get("/status")]
 pub fn status_page(
   user: AuthenticatedUser,

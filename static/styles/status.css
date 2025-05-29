@@ -18,3 +18,7 @@
 .info-item h3 {
 	text-decoration: underline;
 }
+
+.info-item pre {
+	text-wrap: wrap;
+}

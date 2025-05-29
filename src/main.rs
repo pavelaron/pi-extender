@@ -24,10 +24,10 @@ use crate::util::{
   },
   crypto_utils::generate_token,
   output_utils::{
-    run_command,
     output,
     get_pwa_headers,
   },
+  wireless_utils::initialize_wireless,
   routes::*,
 };
 
@@ -94,26 +94,7 @@ fn launch() -> Rocket<Build> {
   output("Initializing admin server...");
   dotenv().ok();
 
-  let data = sled::open("./data").unwrap();
-
-  if data.contains_key("source_ssid").unwrap() {
-    let ssid = data.get("source_ssid").unwrap().unwrap();
-    let pwd = data.get("source_password").unwrap().unwrap();
-
-    let str_ssid = str::from_utf8(ssid.as_ref()).unwrap();
-    let str_pwd = str::from_utf8(pwd.as_ref()).unwrap();
-
-    run_command("nmcli", &[
-      "dev",
-      "wifi",
-      "connect",
-      &format!("\"{str_ssid}\""),
-      "password",
-      &format!("\"{str_pwd}\""),
-    ]);
-  }
-
-  run_command("nmcli", &["con", "modify", "Hotspot", "wifi-sec.pmf", "disable"]);
+  initialize_wireless();
 
   static STATIC_DIR: Dir = include_dir!("static");
 
@@ -146,6 +127,7 @@ fn launch() -> Rocket<Build> {
       save_credential,
       restart,
       logout,
+      devtools,
     ],
   )
 }
