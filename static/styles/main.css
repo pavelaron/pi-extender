@@ -140,6 +140,5 @@ hr {
 			-webkit-background-clip: text;
 			-webkit-text-fill-color: white;
 			transition: background-color 5000s ease-in-out 0s;
-			font-family: 'DepartureMono', monospace;
 	}
 }

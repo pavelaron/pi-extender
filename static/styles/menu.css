@@ -52,4 +52,8 @@
 	.container-items .item:visited {
 		color: white;
 	}
+
+	.container-items .item img {
+		filter: invert(0.1) brightness(1.5);
+	}
 }
