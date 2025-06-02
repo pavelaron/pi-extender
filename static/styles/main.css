@@ -105,8 +105,9 @@ input.card:hover {
 	text-align: center;
 }
 
-.btn-back .button {
-	color: white;
+.btn-back .button,
+.btn-back .button:visited {
+	color: black;
 	text-align: center;
 	display: block;
 	text-decoration: none;
@@ -151,5 +152,10 @@ hr {
 			-webkit-background-clip: text;
 			-webkit-text-fill-color: white;
 			transition: background-color 5000s ease-in-out 0s;
+	}
+
+	.btn-back .button,
+	.btn-back .button:visited {
+		color: white;
 	}
 }
