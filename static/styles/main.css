@@ -56,6 +56,20 @@ html, body {
 	font-size: 12px;
 }
 
+.label select.card {
+	width: 100%;
+	font-family: 'DepartureMono', monospace;
+	padding: 18px;
+	border-style: none;
+	-webkit-appearance: none;
+	appearance: none;
+	background-image: url(/images/ic_chevron_down.svg);
+	background-size: 36px;
+	background-repeat: no-repeat;
+	background-position: right 10px center;
+	cursor: pointer;
+}
+
 input[type="submit"] {
 	background-color: rgb(96, 125, 139);
 	color: white;
@@ -135,7 +149,8 @@ hr {
 		color: rgba(255, 255, 255, 0.6);
 	}
 
-	.label input.card {
+	.label input.card,
+	.label select.card {
 		background-color: transparent;
 		color: white;
 		caret-color: rgba(255, 255, 255, 0.6);

@@ -101,14 +101,14 @@ fn launch() -> Rocket<Build> {
   rocket::build()
     .attach(HandlebarsResponse::fairing(|handlebars| {
       handlebars_resources_initialize!(
-        handlebars,
-        "index"       => "templates/index.html.hbs",
-        "wireless"    => "templates/wireless.html.hbs",
-        "error"       => "templates/error.html.hbs",
-        "login"       => "templates/login.html.hbs",
-        "status"      => "templates/status.html.hbs",
-        "credential"  => "templates/credential.html.hbs",
-        "pwa"         => "templates/headers.hbs",
+          handlebars,
+          "index"       => "templates/index.html.hbs",
+          "wireless"    => "templates/wireless.html.hbs",
+          "error"       => "templates/error.html.hbs",
+          "login"       => "templates/login.html.hbs",
+          "status"      => "templates/status.html.hbs",
+          "credential"  => "templates/credential.html.hbs",
+          "pwa"         => "templates/headers.hbs",
         );
       })
     )

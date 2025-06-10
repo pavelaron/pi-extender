@@ -66,6 +66,14 @@
 							>
 							<div class="label-text">Access point password</div>
 						</label>
+						<label class="label" for="ap_interface">
+							<select name="ap_interface" class="card" required>
+								{{#each interfaces}}
+									<option value="{{ this }}">{{ this }}</option>
+								{{/each}}
+							</select>
+							<div class="label-text">Access point interface</div>
+						</label>
 						<input type="submit" class="card" value="Save">
 						<div class="card btn-back">
 							<a href="/" class="button">Cancel</a>

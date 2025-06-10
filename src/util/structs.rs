@@ -26,6 +26,7 @@ pub struct WirelessInput {
   pub source_password: String,
   pub ap_ssid: String,
   pub ap_password: String,
+  pub ap_interface: String,
 }
 
 #[derive(Serialize)]

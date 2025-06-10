@@ -1,7 +1,7 @@
 use std::{
   collections::HashMap,
   os::unix::process::ExitStatusExt,
-  process::Command,
+  process::{Command, Stdio},
   str,
 };
 use local_ip_address::{list_afinet_netifas, local_ip};
@@ -12,8 +12,11 @@ use rocket::{
   Request,
   State,
 };
+
 use rocket_include_handlebars::{EtagIfNoneMatch, HandlebarsContextManager, HandlebarsResponse};
 use sysinfo::System;
+
+use crate::util::wireless_utils::{connect_to_network, get_interfaces};
 
 use super::{
   crypto_utils::{generate_token, get_salt, hash_password},
@@ -122,10 +125,12 @@ pub fn wireless(
   etag_if_none_match: EtagIfNoneMatch,
 ) -> HandlebarsResponse {
   let data = sled::open("./data").unwrap();
+  let interfaces = get_interfaces();
 
-  let mut map: HashMap<&str, String> = HashMap::from([
-    ("pwa_headers", user.pwa_headers),
-  ]);
+  let mut map = serde_json::json! {{
+    "pwa_headers": user.pwa_headers,
+    "interfaces":  interfaces,
+  }};
 
   let keys = [
     "source_ssid",
@@ -142,7 +147,7 @@ pub fn wireless(
     let value = data.get(key).unwrap().unwrap();
     let str_value = String::from_utf8(value.to_vec()).unwrap();
 
-    map.insert(key, str_value);
+    map[key] = serde_json::Value::String(str_value);
   }
 
   handlebars_response!(handlebars_cm, etag_if_none_match, "wireless", map)
@@ -167,10 +172,12 @@ pub fn save_wireless(_user: AuthenticatedUser, wireless_input: Form<WirelessInpu
   let data = sled::open("./data").unwrap();
   let mut batch = sled::Batch::default();
 
-  batch.insert("source_ssid", wireless_input.source_ssid.as_str());
-  batch.insert("source_password", wireless_input.source_password.as_str());
+  let src_ssid = wireless_input.source_ssid.as_str();
+  let src_password = wireless_input.source_password.as_str();
+
   batch.insert("ap_ssid", wireless_input.ap_ssid.as_str());
   batch.insert("ap_password", wireless_input.ap_password.as_str());
+  batch.insert("ap_interface", wireless_input.ap_interface.as_str());
 
   data
     .apply_batch(batch)
@@ -178,7 +185,15 @@ pub fn save_wireless(_user: AuthenticatedUser, wireless_input: Form<WirelessInpu
 
   let _ = data.flush();
 
-  run_command("reboot", &["-h", "now"]);
+  connect_to_network(src_ssid, src_password);
+
+  let _ = Command::new("sh")
+    .arg("-c")
+    .arg("sleep 5 ; reboot")
+    .stdin(Stdio::null())
+    .stdout(Stdio::null()) 
+    .stderr(Stdio::null())
+    .spawn();
 
   Redirect::to("/")
 }
