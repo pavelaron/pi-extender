@@ -3,6 +3,7 @@ Description=Pi Extender service
 After=network.target
  
 [Service]
+EnvironmentFile=/home/pi/shared/www/.env
 ExecStart=/home/pi/shared/www/pi_extender
 Restart=on-failure
 KillMode=process
