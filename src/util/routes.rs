@@ -1,8 +1,5 @@
 use std::{
-  collections::HashMap,
-  os::unix::process::ExitStatusExt,
-  process::{Command, Stdio},
-  str,
+  collections::HashMap, net::IpAddr, os::unix::process::ExitStatusExt, process::{Command, Stdio}, str
 };
 use local_ip_address::{list_afinet_netifas, local_ip};
 use rocket::{
@@ -83,13 +80,7 @@ pub fn status_page(
   let hostname = System::host_name();
   let total_mem = system.total_memory();
   let ip = local_ip().unwrap();
-  let network_interfaces: String = list_afinet_netifas()
-    .unwrap()
-    .iter()
-    .fold(
-      String::from(""), 
-      |acc: String, (name, ip)| format!("{}{}:\t{:?}\n", acc, name, ip),
-    );
+  let network_interfaces: Vec<(String, IpAddr)> = list_afinet_netifas().unwrap();
 
   let output = Command::new("iwgetid")
     .output()
@@ -103,19 +94,19 @@ pub fn status_page(
 
   let source_ap = String::from_utf8(output.stdout).unwrap();
 
-  let map: HashMap<&str, String> = HashMap::from([
-    ("pwa_headers",   user.pwa_headers),
-    ("response",      response_str),
-    ("boot_time",     format!("{}", boot)),
-    ("load_avg",      format!("{:?}%", load_avg.five)),
-    ("memory",        format!("{:?} of {:?} bytes", free_mem, total_mem)),
-    ("source_ap",     source_ap),
-    ("hostname",      hostname.unwrap()),
-    ("local_ip",      ip.to_string()),
-    ("interfaces",    network_interfaces),
-  ]);
+  let status_data = serde_json::json! {{
+    "pwa_headers": user.pwa_headers,
+    "response": response_str,
+    "boot_time": format!("{}", boot),
+    "load_avg": format!("{:?}%", load_avg.five),
+    "memory": format!("{:?} of {:?} bytes", free_mem, total_mem),
+    "source_ap": source_ap,
+    "hostname": hostname.unwrap(),
+    "local_ip": ip.to_string(),
+    "interfaces": network_interfaces,
+  }};
 
-  handlebars_response!(handlebars_cm, etag_if_none_match, "status", map)
+  handlebars_response!(handlebars_cm, etag_if_none_match, "status", status_data)
 }
 
 #[get("/wireless-settings")]

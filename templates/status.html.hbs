@@ -45,7 +45,13 @@
 						</div>
 						<div class="info-item">
 							<h3>Network interfaces</h3>
-							<pre>{{ interfaces }}</pre>
+							<div class="container-interface">
+								{{#each interfaces}}
+									<div class="ifc-info">
+										{{ this.0 }}: <span>{{ this.1 }}</span>
+									</div>
+								{{/each}}
+							</div>
 						</div>
 						<div class="card btn-back">
 							<a href="/" class="button">Back</a>

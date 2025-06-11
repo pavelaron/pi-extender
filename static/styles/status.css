@@ -19,6 +19,17 @@
 	text-decoration: underline;
 }
 
-.info-item pre {
-	text-wrap: wrap;
+.info-item .container-interface {
+	width: 100%;
+	overflow: ellipsis;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+
+.info-item .container-interface .ifc-info {
+	display: flex;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	font-size: 14px;
 }
