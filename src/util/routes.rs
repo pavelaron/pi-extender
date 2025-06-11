@@ -75,7 +75,7 @@ pub fn status_page(
 
   let response_str = format_ferris("Repeater is up and running!");
   let boot = System::boot_time();
-  let load_avg = System::load_average();
+  let cpu_usage = system.global_cpu_usage();
   let free_mem = system.free_memory();
   let hostname = System::host_name();
   let total_mem = system.total_memory();
@@ -98,7 +98,7 @@ pub fn status_page(
     "pwa_headers": user.pwa_headers,
     "response": response_str,
     "boot_time": format!("{}", boot),
-    "load_avg": format!("{:?}%", load_avg.five),
+    "cpu_usage": format!("{:?}%", cpu_usage),
     "memory": format!("{:?} of {:?} bytes", free_mem, total_mem),
     "source_ap": source_ap,
     "hostname": hostname.unwrap(),
