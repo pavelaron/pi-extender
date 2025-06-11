@@ -1,0 +1,11 @@
+[Unit]
+Description=Pi Extender service
+After=network.target
+ 
+[Service]
+ExecStart=/home/pi/shared/www/pi_extender
+Restart=on-failure
+KillMode=process
+ 
+[Install]
+WantedBy=multi-user.target
