@@ -36,7 +36,6 @@ pub fn get_interfaces() -> Vec<String> {
   let interfaces: Vec<String> = nmcli_result
     .unwrap()
     .lines()
-    .filter(|line| line.contains(": disconnected"))
     .filter_map(|line| line.split(':').next())
     .map(|line| line.to_string())
     .collect();
