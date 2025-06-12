@@ -129,6 +129,18 @@ input.card:hover {
 	padding: 18px;
 }
 
+.btn-swal {
+	font-family: 'DepartureMono', monospace;
+}
+
+.btn-swal.btn-confirm {
+	background-color: rgb(48, 133, 214);
+}
+
+.btn-swal.btn-cancel {
+	background-color: rgb(221, 51, 51);
+}
+
 hr {
 	width: 100%;
 	opacity: 0.5;

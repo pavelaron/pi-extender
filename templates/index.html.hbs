@@ -30,7 +30,7 @@
 					<a
 						href="/restart"
 						class="card item"
-						onclick="return confirm('Are you sure you want to restart?')"
+						onclick="return swalConfirm(this, 'Are you sure you want to restart?')"
 					>
 						<img src="/images/ic_restart.svg" alt="Restart">
 						<div>Restart</div>
@@ -38,7 +38,7 @@
 					<a
 						href="/logout"
 						class="card item"
-						onclick="return confirm('Are you sure you want to logout?')"
+						onclick="return swalConfirm(this, 'Are you sure you want to logout?')"
 					>
 						<img src="/images/ic_logout.svg" alt="Logout">
 						<div>Logout</div>
@@ -46,5 +46,7 @@
 				</div>
 			</div>
 		</div>
+		<script type="text/javascript" src="/scripts/sweetalert2.all.min.js"></script>
+		<script type="text/javascript" src="/scripts/main.js"></script>
 	</body>
 </html>
