@@ -1,5 +1,6 @@
 use std::str;
 use sled::IVec;
+use waifai::{Hotspot, WiFi};
 
 use super::output_utils::run_command;
 
@@ -21,29 +22,13 @@ pub fn connect_to_network(ssid: &str, password: &str) {
 }
 
 pub fn get_interfaces() -> Vec<String> {
-  let raw_interfaces = run_command("nmcli", &[
-    "-t",
-    "-f",
-    "active,wifi",
-  ]);
-
-  if raw_interfaces.is_none() {
-    return Vec::new();
+  match WiFi::interfaces () {
+    Ok(interfaces) => interfaces,
+    Err(error) => {
+      println!("Error: {}", error);
+      Vec::new()
+    }
   }
-
-  let nmcli_result = String::from_utf8(raw_interfaces.unwrap().stdout);
-
-  let interfaces: Vec<String> = nmcli_result
-    .unwrap()
-    .lines()
-    .filter(|line| {
-      line.contains(": connected") || line.contains(": disconnected")
-    })
-    .filter_map(|line| line.split(':').next())
-    .map(|line| line.to_string())
-    .collect();
-
-  interfaces
 }
 
 fn initialize_ap(data: &sled::Db) {
@@ -61,30 +46,25 @@ fn initialize_ap(data: &sled::Db) {
 
   let stored_interface = ap_interface_binding
     .as_ref();
-
-  let ifname: &[&str] = match stored_interface {
-    Some(stored_interface) => &[
-      "ifname",
-      str::from_utf8(stored_interface).unwrap(),
-    ],
-    None => &[],
+  
+  let ap_interface: String = match stored_interface {
+    Some(stored_interface) => String::from_utf8(stored_interface.to_vec()).unwrap(),
+    None => String::from("wlan0"),
   };
 
-  let args = [
-    "device",
-    "wifi",
-    "hotspot",
-  ]
-  .iter()
-  .chain(ifname.iter())
-  .chain([
-    "ssid",
-    str::from_utf8(stored_ssid.as_ref()).unwrap(),
-    "password",
-    str::from_utf8(stored_password.as_ref()).unwrap(),
-  ].iter())
-  .copied()
-  .collect::<Vec<_>>();
+  let ssid = str::from_utf8(stored_ssid.as_ref()).unwrap();
+  let password = str::from_utf8(stored_password.as_ref()).unwrap();
 
-  run_command("nmcli", args.as_slice());
+  let hotspot = WiFi::new(ap_interface);
+
+  match hotspot.create(ssid, Some(password)) {
+    Ok(instance) => {
+      let _ = hotspot.start();
+      instance
+    },
+    Err(error) => {
+      println!("Error creating hotspot: {}", error);
+      return;
+    },
+  };
 }

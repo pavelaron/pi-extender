@@ -1705,6 +1705,7 @@ dependencies = [
  "sled",
  "sysinfo",
  "vrd 0.0.8",
+ "waifai",
 ]
 
 [[package]]
@@ -2822,6 +2823,12 @@ dependencies = [
  "uuid",
  "version_check",
 ]
+
+[[package]]
+name = "waifai"
+version = "0.3.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "da4298004447f726f7bcc6c330fd45ff8d02234dfd3c47e6cb4606bbd854bbdb"
 
 [[package]]
 name = "walkdir"
