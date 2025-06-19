@@ -1,22 +1,28 @@
-var swalConfirm = function(anchor, message) {
-  Swal.fire({
-    title: message,
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonText: 'OK',
-    cancelButtonText: 'Cancel',
-    customClass: {
-      confirmButton: 'btn-swal btn-confirm',
-      cancelButton: 'btn-swal btn-cancel',
-    },
-    theme: 'auto',
-  }).then(function(result) {
-    if (!result.isConfirmed) {
-      return;
-    }
+(function() {
+  var modalButtons = document.getElementsByClassName('modal-confirm');
 
-    window.location.href = anchor.href;
-  });
+  for (var i = 0; i < modalButtons.length; i++) {
+    modalButtons[i].addEventListener('click', function(event) {
+      event.preventDefault();
 
-  return false;
-};
+      Swal.fire({
+        title: event.target.getAttribute('data-modal-message'),
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'OK',
+        cancelButtonText: 'Cancel',
+        customClass: {
+          confirmButton: 'btn-swal btn-confirm',
+          cancelButton: 'btn-swal btn-cancel',
+        },
+        theme: 'auto',
+      }).then(function(result) {
+        if (!result.isConfirmed) {
+          return;
+        }
+
+        window.location.href = event.target.href;
+      });
+    });
+  }
+})();
