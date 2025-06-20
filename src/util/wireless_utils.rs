@@ -8,6 +8,7 @@ pub fn initialize_wireless() {
   let data = sled::open("./data").unwrap();
   
   initialize_ap(&data);
+  disable_pwr_mgmt("wlan0");
 }
 
 pub fn connect_to_network(ssid: &str, password: &str) {
@@ -29,6 +30,14 @@ pub fn get_interfaces() -> Vec<String> {
       Vec::new()
     }
   }
+}
+
+pub fn disable_pwr_mgmt(interface: &str) {
+  run_command("iwconfig", &[
+    interface,
+    "power",
+    "off",
+  ]);
 }
 
 fn initialize_ap(data: &sled::Db) {
@@ -60,6 +69,7 @@ fn initialize_ap(data: &sled::Db) {
   match hotspot.create(ssid, Some(password)) {
     Ok(instance) => {
       let _ = hotspot.start();
+      disable_pwr_mgmt(hotspot.interface());
       instance
     },
     Err(error) => {

@@ -13,7 +13,11 @@ use rocket::{
 use rocket_include_handlebars::{EtagIfNoneMatch, HandlebarsContextManager, HandlebarsResponse};
 use sysinfo::System;
 
-use crate::util::wireless_utils::{connect_to_network, get_interfaces};
+use crate::util::wireless_utils::{
+  connect_to_network,
+  disable_pwr_mgmt,
+  get_interfaces,
+};
 
 use super::{
   crypto_utils::{generate_token, get_salt, hash_password},
@@ -177,6 +181,7 @@ pub fn save_wireless(_user: AuthenticatedUser, wireless_input: Form<WirelessInpu
   let _ = data.flush();
 
   connect_to_network(src_ssid, src_password);
+  disable_pwr_mgmt(&wireless_input.ap_interface);
 
   let _ = Command::new("sh")
     .arg("-c")
