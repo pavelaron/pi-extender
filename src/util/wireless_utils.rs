@@ -9,6 +9,8 @@ pub fn initialize_wireless() {
   
   initialize_ap(&data);
   disable_pwr_mgmt("wlan0");
+
+  drop(data);
 }
 
 pub fn connect_to_network(ssid: &str, password: &str) {

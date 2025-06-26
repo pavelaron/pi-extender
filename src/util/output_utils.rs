@@ -4,7 +4,7 @@ use rocket_dyn_templates::context;
 use rocket_include_handlebars::HandlebarsContextManager;
 use std::{
   io::{stdout, BufWriter},
-  process::{Command, Output},
+  process::Command,
 };
 
 pub fn output(message: &str) {
@@ -27,20 +27,18 @@ pub fn format_ferris(message: &str) -> String {
   String::from_utf8(output).unwrap()
 }
 
-pub fn run_command(cmd: &str, args: &[&str]) -> Option<Output> {
+pub fn run_command(cmd: &str, args: &[&str]) {
   if cfg!(debug_assertions) {
     let full_command = format!("{} {}", cmd, args.join(" "));
     println!("Running command: {}", full_command);
 
-    return None;
+    return;
   }
 
-  let output = Command::new(cmd)
+  let _ = Command::new(cmd)
     .args(args)
     .output()
     .expect("failed to execute process");
-
-  Some(output)
 }
 
 pub fn get_pwa_headers(req: &Request) -> String {

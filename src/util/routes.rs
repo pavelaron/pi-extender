@@ -31,8 +31,10 @@ pub fn index(
   handlebars_cm: &State<HandlebarsContextManager>,
   etag_if_none_match: EtagIfNoneMatch,
 ) -> HandlebarsResponse {
+  let headers = user.pwa_headers.to_string();
+  
   let map: HashMap<&str, String> = HashMap::from([
-    ("pwa_headers", user.pwa_headers),
+    ("pwa_headers", headers),
   ]);
 
   handlebars_response!(handlebars_cm, etag_if_none_match, "index", map)
@@ -96,6 +98,8 @@ pub fn status_page(
       }
     });
 
+  drop(system);
+
   let source_ap = String::from_utf8(output.stdout).unwrap();
 
   let status_data = serde_json::json! {{
@@ -145,6 +149,8 @@ pub fn wireless(
     map[key] = serde_json::Value::String(str_value);
   }
 
+  drop(data);
+
   handlebars_response!(handlebars_cm, etag_if_none_match, "wireless", map)
 }
 
@@ -163,7 +169,7 @@ pub fn credential(
 }
 
 #[post["/save-wireless", data = "<wireless_input>"]]
-pub fn save_wireless(_user: AuthenticatedUser, wireless_input: Form<WirelessInput>) -> Redirect {
+pub fn save_wireless(wireless_input: Form<WirelessInput>) -> Redirect {
   let data = sled::open("./data").unwrap();
   let mut batch = sled::Batch::default();
 
@@ -183,6 +189,8 @@ pub fn save_wireless(_user: AuthenticatedUser, wireless_input: Form<WirelessInpu
   connect_to_network(src_ssid, src_password);
   disable_pwr_mgmt(&wireless_input.ap_interface);
 
+  drop(data);
+
   let _ = Command::new("sh")
     .arg("-c")
     .arg("sleep 5 ; reboot")
@@ -196,7 +204,6 @@ pub fn save_wireless(_user: AuthenticatedUser, wireless_input: Form<WirelessInpu
 
 #[post["/save-credential", data = "<credential_input>"]]
 pub fn save_credential(
-  _user: AuthenticatedUser,
   credential_input: Form<LoginInput>,
   cookies: &CookieJar<'_>,
 ) -> Redirect {
@@ -214,6 +221,7 @@ pub fn save_credential(
     .expect("Failed to save credential settings");
 
   let _ = data.flush();
+  drop(data);
 
   let token_string = match generate_token(username) {
     Ok(token) => Ok(token),
@@ -244,6 +252,8 @@ pub fn auth(login_input: Form<LoginInput>, cookies: &CookieJar<'_>) -> Redirect 
   let stored = data.get(username).unwrap().unwrap();
   let val = str::from_utf8(stored.as_ref()).unwrap();
 
+  drop(data);
+
   if val != hash_password(password, salt) {
     return Redirect::to("/");
   }
@@ -259,13 +269,13 @@ pub fn auth(login_input: Form<LoginInput>, cookies: &CookieJar<'_>) -> Redirect 
 }
 
 #[get("/logout")]
-pub fn logout(_user: AuthenticatedUser, cookies: &CookieJar<'_>) -> Redirect {
+pub fn logout(cookies: &CookieJar<'_>) -> Redirect {
   cookies.remove(Cookie::from("token"));
   Redirect::to("/")
 }
 
 #[get("/restart")]
-pub fn restart(_user: AuthenticatedUser) -> Redirect {
+pub fn restart() -> Redirect {
   run_command("reboot", &["-h", "now"]);
   Redirect::to("/")
 }
