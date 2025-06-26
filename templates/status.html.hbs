@@ -2,8 +2,8 @@
 <html lang="en">
 	<head>
 		<title>Admin server status</title>
-		<meta name="boot_time" content="{{ boot_time }}">
-		{{{ pwa_headers }}}
+		<meta name="boot_time" content="{{boot_time}}">
+		{{{pwa_headers}}}
 
 		<link rel="stylesheet" href="/styles/main.css">
 		<link rel="stylesheet" href="/styles/status.css">
@@ -16,7 +16,7 @@
 						<img src="/images/app-icons/web/icon-512.png" alt="pi-extender">
 					</div>
 					<h1 class="card-title">Status</h1>
-					<pre class="output">{{ response }}</pre>
+					<pre class="output">{{response}}</pre>
 					<hr>
 					<div class="container-info">
 						<div class="info-item">
@@ -25,30 +25,30 @@
 						</div>
 						<div class="info-item">
 							<h3>CPU usage</h3>
-							<div>{{ cpu_usage }}</div>
+							<div>{{cpu_usage}}</div>
 						</div>
 						<div class="info-item">
 							<h3>Free memory</h3>
-							<div>{{ memory }}</div>
+							<div>{{memory}}</div>
 						</div>
 						<div class="info-item">
 							<h3>Source AP</h3>
-							<div>{{ source_ap }}</div>
+							<div>{{source_ap}}</div>
 						</div>
 						<div class="info-item">
 							<h3>Hostname</h3>
-							<div>{{ hostname }}</div>
+							<div>{{hostname}}</div>
 						</div>
 						<div class="info-item">
 							<h3>IP address</h3>
-							<div>{{ local_ip }}</div>
+							<div>{{local_ip}}</div>
 						</div>
 						<div class="info-item">
 							<h3>Network interfaces</h3>
 							<div class="container-interface">
 								{{#each interfaces}}
 									<div class="ifc-info">
-										{{ this.0 }}: <span>{{ this.1 }}</span>
+										{{this.0}}: <span>{{this.1}}</span>
 									</div>
 								{{/each}}
 							</div>

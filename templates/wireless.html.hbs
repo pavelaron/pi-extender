@@ -2,7 +2,7 @@
 <html lang="en">
 	<head>
 		<title>Wireless settings</title>
-		{{{ pwa_headers }}}
+		{{{pwa_headers}}}
 
 		<link rel="stylesheet" href="/styles/main.css">
 		<link rel="stylesheet" href="/styles/wireless.css">
@@ -47,7 +47,7 @@
 								class="card"
 								name="ap_ssid"
 								placeholder="Access point SSID"
-								value="{{ ap_ssid }}"
+								value="{{ap_ssid}}"
 								required
 							>
 							<div class="label-text">Access point SSID</div>
@@ -59,7 +59,7 @@
 								name="ap_password"
 								pattern=".{8,}"
 								placeholder="Access point password"
-								value="{{ ap_password }}"
+								value="{{ap_password}}"
 								required
 							>
 							<div class="label-text">Access point password</div>
@@ -67,9 +67,11 @@
 						<label class="label" for="ap_interface">
 							<select name="ap_interface" class="card" required>
 								{{#each interfaces}}
-									<option value="{{ this }}" {{#if (eq this ap_interface)}} selected {{/if}}>
-										{{ this }}
-									</option>
+									{{#if (eq this ../ap_interface)}}
+										<option value="{{this}}" selected="selected">{{this}}</option>
+									{{else}}
+										<option value="{{this}}">{{this}}</option>
+									{{/if}}
 								{{/each}}
 							</select>
 							<div class="label-text">Access point interface</div>
