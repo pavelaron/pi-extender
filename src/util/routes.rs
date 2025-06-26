@@ -131,22 +131,17 @@ pub fn wireless(
     "interfaces":  interfaces,
   }};
 
-  let keys = [
-    "source_ssid",
-    "source_password",
-    "ap_ssid",
-    "ap_password",
-  ];
-
-  for key in keys {
-    if !data.contains_key(key).unwrap() {
+  for item in data.scan_prefix(b"ap_") {
+    if item.is_err() {
       continue;
     }
 
-    let value = data.get(key).unwrap().unwrap();
-    let str_value = String::from_utf8(value.to_vec()).unwrap();
+    let (item_key, item_value) = item.unwrap();
 
-    map[key] = serde_json::Value::String(str_value);
+    let key = String::from_utf8(item_key.to_vec()).unwrap();
+    let value = String::from_utf8(item_value.to_vec()).unwrap();
+
+    map[key] = serde_json::Value::String(value);
   }
 
   drop(data);
