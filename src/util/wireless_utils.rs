@@ -26,7 +26,7 @@ pub fn get_interfaces() -> Vec<String> {
   match WiFi::interfaces () {
     Ok(interfaces) => interfaces,
     Err(error) => {
-      println!("Error: {}", error);
+      println!("Error retrieving interfaces: {}", error);
       Vec::new()
     }
   }

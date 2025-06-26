@@ -67,7 +67,7 @@ impl<'r> FromRequest<'r> for AuthenticatedUser {
         let refreshed_token = match generate_token(&token_data.claims.sub) {
           Ok(token) => token,
           Err(error) => {
-            println!("Error: {}", error);
+            println!("Token generation error: {}", error);
             return Outcome::Error((Status::Unauthorized, ()));
           }
         };
@@ -82,7 +82,7 @@ impl<'r> FromRequest<'r> for AuthenticatedUser {
         })
       },
       Err(error) => {
-        println!("Error: {}", error);
+        println!("Error decoding token: {}", error);
         Outcome::Error((Status::Unauthorized, ()))
       }
     }
