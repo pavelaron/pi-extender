@@ -1,5 +1,5 @@
 use std::str;
-use sled::IVec;
+use sled::{Db, IVec};
 use waifai::{Hotspot, WiFi};
 
 use super::output_utils::run_command;
@@ -42,20 +42,20 @@ pub fn disable_pwr_mgmt(interface: &str) {
   ]);
 }
 
-fn initialize_ap(data: &sled::Db) {
-  let stored_ssid = data.get("ap_ssid")
+fn initialize_ap(data: &Db) {
+  let stored_ssid: IVec = data.get("ap_ssid")
     .unwrap()
     .unwrap_or(IVec::from("pi-extender"));
   
-  let stored_password = data.get("ap_password")
+  let stored_password: IVec = data.get("ap_password")
     .unwrap()
     .unwrap_or(IVec::from("changeme"));
 
-  let ap_interface_binding = data
+  let ap_interface_binding: Option<IVec> = data
     .get("ap_interface")
     .unwrap();
 
-  let stored_interface = ap_interface_binding
+  let stored_interface: Option<&IVec> = ap_interface_binding
     .as_ref();
   
   let ap_interface: String = match stored_interface {
@@ -63,10 +63,10 @@ fn initialize_ap(data: &sled::Db) {
     None => String::from("wlan0"),
   };
 
-  let ssid = str::from_utf8(stored_ssid.as_ref()).unwrap();
-  let password = str::from_utf8(stored_password.as_ref()).unwrap();
+  let ssid: &str = str::from_utf8(stored_ssid.as_ref()).unwrap();
+  let password: &str = str::from_utf8(stored_password.as_ref()).unwrap();
 
-  let hotspot = WiFi::new(ap_interface);
+  let hotspot: WiFi = WiFi::new(ap_interface);
 
   match hotspot.create(ssid, Some(password)) {
     Ok(instance) => {

@@ -42,17 +42,17 @@ impl<'r> FromRequest<'r> for AuthenticatedUser {
   type Error = ();
 
   async fn from_request(request: &'r Request<'_>) -> Outcome<Self, Self::Error> {
-    let cookies = request.cookies().get("token");
-    let pwa_headers = get_pwa_headers(request);
+    let cookies: Option<&Cookie<'static>> = request.cookies().get("token");
+    let pwa_headers: String = get_pwa_headers(request);
 
-    let token = match cookies {
+    let token: &str = match cookies {
       Some(token) => token.value(),
       None => return Outcome::Error((Status::Unauthorized, ())),
     };
 
     // Validate token
-    let secret = env::var("JWT_SECRET").expect("JWT_SECRET must be set");
-    let validation = Validation::default();
+    let secret: String = env::var("JWT_SECRET").expect("JWT_SECRET must be set");
+    let validation: Validation = Validation::default();
 
     match decode::<Claims>(
       &token,
@@ -64,7 +64,7 @@ impl<'r> FromRequest<'r> for AuthenticatedUser {
           return Outcome::Error((Status::Unauthorized, ()));
         }
 
-        let refreshed_token = match generate_token(&token_data.claims.sub) {
+        let refreshed_token: String = match generate_token(&token_data.claims.sub) {
           Ok(token) => token,
           Err(error) => {
             println!("Token generation error: {}", error);

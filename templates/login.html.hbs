@@ -13,11 +13,26 @@
 				<h1 class="card-title">Admin page login</h1>
 				<form action="/" method="POST">
 					<label class="label" for="username">
-						<input type="text" class="card" name="username" placeholder="Username" required>
+						<input
+							type="text"
+							class="card"
+							id="username"
+							name="username"
+							placeholder="Username"
+							required
+						>
 						<div class="label-text">Username</div>
 					</label>
 					<label class="label" for="password">
-						<input type="password" class="card" name="password" pattern=".{8,}" placeholder="Password" required>
+						<input
+							type="password"
+							class="card"
+							id="password"
+							name="password"
+							pattern=".{8,}"
+							placeholder="Password"
+							required
+						>
 						<div class="label-text">Password</div>
 					</label>
 					<input type="submit" class="card" value="Login">

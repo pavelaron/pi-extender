@@ -11,7 +11,7 @@ use sled::Db;
 use super::structs::Claims;
 
 pub fn get_salt(data: &Db) -> String {
-  let key = "keys::SALT";
+  let key: &'static str = "keys::SALT";
 
   if data.contains_key(key).unwrap() {
     let stored = data.get(key).unwrap().unwrap();
@@ -20,9 +20,10 @@ pub fn get_salt(data: &Db) -> String {
     return String::from_utf8(value.to_vec()).unwrap();
   }
 
-  let salt = random_string!(10);
+  let salt: String = random_string!(10);
 
-  data.insert(key, salt.as_str())
+  data
+    .insert(key, salt.as_str())
     .expect("Failed to save salt");
 
   let _ = data.flush();
@@ -31,7 +32,7 @@ pub fn get_salt(data: &Db) -> String {
 }
 
 pub fn hash_password(password: &str, salt: &String) -> String {
-  let algo = "argon2i";
+  let algo: &'static str = "argon2i";
 
   Hash::new(password, salt.as_str(), algo)
     .expect("Failed to create hash")
@@ -39,14 +40,14 @@ pub fn hash_password(password: &str, salt: &String) -> String {
 }
 
 pub fn generate_token(user_id: &str) -> Result<String, Error> {
-  let secret = env::var("JWT_SECRET").expect("JWT_SECRET must be set");
+  let secret: String = env::var("JWT_SECRET").expect("JWT_SECRET must be set");
 
-  let expiration = Utc::now()
+  let expiration: i64 = Utc::now()
     .checked_add_signed(Duration::minutes(10))
     .expect("valid timestamp")
     .timestamp();
 
-  let claims = Claims {
+  let claims: Claims = Claims {
     sub: user_id.to_string(),
     exp: expiration,
     iat: Utc::now().timestamp(),

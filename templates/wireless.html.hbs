@@ -22,6 +22,7 @@
 							<input
 								type="text"
 								class="card"
+								id="source_ssid"
 								name="source_ssid"
 								placeholder="Source SSID"
 								required
@@ -32,6 +33,7 @@
 							<input
 								type="password"
 								class="card"
+								id="source_password"
 								name="source_password"
 								pattern=".{8,}"
 								placeholder="Source password"
@@ -45,6 +47,7 @@
 							<input
 								type="text"
 								class="card"
+								id="ap_ssid"
 								name="ap_ssid"
 								placeholder="Access point SSID"
 								value="{{ap_ssid}}"
@@ -56,6 +59,7 @@
 							<input
 								type="password"
 								class="card"
+								id="ap_password"
 								name="ap_password"
 								pattern=".{8,}"
 								placeholder="Access point password"
@@ -65,7 +69,7 @@
 							<div class="label-text">Access point password</div>
 						</label>
 						<label class="label" for="ap_interface">
-							<select name="ap_interface" class="card" required>
+							<select id="ap_interface" name="ap_interface" class="card" required>
 								{{#each interfaces}}
 									{{#if (eq this ../ap_interface)}}
 										<option value="{{this}}" selected="selected">{{this}}</option>

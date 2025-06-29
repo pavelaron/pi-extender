@@ -3,33 +3,33 @@ use rocket::Request;
 use rocket_dyn_templates::context;
 use rocket_include_handlebars::HandlebarsContextManager;
 use std::{
-  io::{stdout, BufWriter},
+  io::{stdout, Stdout, StdoutLock, BufWriter},
   process::Command,
 };
 
 pub fn output(message: &str) {
-  let stdout = stdout();
-  let width = message.chars().count();
+  let stdout: Stdout = stdout();
+  let width: usize = message.chars().count();
 
-  let mut writer = BufWriter::new(stdout.lock());
+  let mut writer: BufWriter<StdoutLock<'static>> = BufWriter::new(stdout.lock());
   say(&message, width, &mut writer).unwrap()
 }
 
 pub fn format_ferris(message: &str) -> String {
-  let width = message.chars().count();
+  let width: usize = message.chars().count();
 
-  let buf = Vec::new();
-  let mut writer = BufWriter::new(buf);
+  let buf: Vec<u8> = Vec::new();
+  let mut writer: BufWriter<Vec<u8>> = BufWriter::new(buf);
 
   let _ = say(message, width, &mut writer);
-  let output = writer.into_inner().unwrap();
+  let output: Vec<u8> = writer.into_inner().unwrap();
 
   String::from_utf8(output).unwrap()
 }
 
 pub fn run_command(cmd: &str, args: &[&str]) {
   if cfg!(debug_assertions) {
-    let full_command = format!("{} {}", cmd, args.join(" "));
+    let full_command: String = format!("{} {}", cmd, args.join(" "));
     println!("Running command: {}", full_command);
 
     return;
@@ -42,7 +42,7 @@ pub fn run_command(cmd: &str, args: &[&str]) {
 }
 
 pub fn get_pwa_headers(req: &Request) -> String {
-  let context_manager = req.rocket().state::<HandlebarsContextManager>().unwrap();
+  let context_manager: &HandlebarsContextManager = req.rocket().state::<HandlebarsContextManager>().unwrap();
 
   context_manager.render("pwa", context! {})
 }

@@ -11,6 +11,7 @@ use rocket::{
 };
 
 use rocket_include_handlebars::{EtagIfNoneMatch, HandlebarsContextManager, HandlebarsResponse};
+use sled::{Db, Batch, IVec, open};
 use sysinfo::System;
 
 use crate::util::wireless_utils::{
@@ -31,7 +32,7 @@ pub fn index(
   handlebars_cm: &State<HandlebarsContextManager>,
   etag_if_none_match: EtagIfNoneMatch,
 ) -> HandlebarsResponse {
-  let headers = user.pwa_headers.to_string();
+  let headers: String = user.pwa_headers.to_string();
   
   let map: HashMap<&str, String> = HashMap::from([
     ("pwa_headers", headers),
@@ -42,26 +43,26 @@ pub fn index(
 
 #[catch(401)]
 pub fn login(req: &Request) -> RawHtml<String> {
-  let context_manager = req.rocket().state::<HandlebarsContextManager>().unwrap();
+  let context_manager: Option<&HandlebarsContextManager> = req.rocket().state::<HandlebarsContextManager>();
   let map: HashMap<&str, String> = HashMap::from([
     ("pwa_headers", get_pwa_headers(req)),
   ]);
 
-  let rendered_html = context_manager.render("login", map);
+  let rendered_html: String = context_manager.unwrap().render("login", map);
 
   RawHtml(rendered_html)
 }
 
 #[catch(default)]
 pub fn default_error(status: Status, req: &Request) -> RawHtml<String> {
-  let context_manager = req.rocket().state::<HandlebarsContextManager>().unwrap();
-  let context = HashMap::from([
+  let context_manager: &HandlebarsContextManager = req.rocket().state::<HandlebarsContextManager>().unwrap();
+  let context: HashMap<&'static str, String> = HashMap::from([
     ("pwa_headers", get_pwa_headers(req)),
     ("status",      status.code.to_string()),
     ("message",     format_ferris(&status.reason().unwrap())),
   ]);
 
-  let rendered_html = context_manager.render("error", context);
+  let rendered_html: String = context_manager.render("error", context);
 
   RawHtml(rendered_html)
 }
@@ -123,10 +124,10 @@ pub fn wireless(
   handlebars_cm: &State<HandlebarsContextManager>,
   etag_if_none_match: EtagIfNoneMatch,
 ) -> HandlebarsResponse {
-  let data = sled::open("./data").unwrap();
-  let interfaces = get_interfaces();
+  let data: Db = open("./data").unwrap();
+  let interfaces: Vec<String> = get_interfaces();
 
-  let mut map = serde_json::json! {{
+  let mut json: serde_json::Value = serde_json::json! {{
     "pwa_headers": user.pwa_headers,
     "interfaces":  interfaces,
   }};
@@ -138,15 +139,15 @@ pub fn wireless(
 
     let (item_key, item_value) = item.unwrap();
 
-    let key = String::from_utf8(item_key.to_vec()).unwrap();
-    let value = String::from_utf8(item_value.to_vec()).unwrap();
+    let key: String = String::from_utf8(item_key.to_vec()).unwrap();
+    let value: String = String::from_utf8(item_value.to_vec()).unwrap();
 
-    map[key] = serde_json::Value::String(value);
+    json[key] = serde_json::Value::String(value);
   }
 
   drop(data);
 
-  handlebars_response!(handlebars_cm, etag_if_none_match, "wireless", map)
+  handlebars_response!(handlebars_cm, etag_if_none_match, "wireless", json)
 }
 
 #[get("/credential-settings")]
@@ -165,11 +166,11 @@ pub fn credential(
 
 #[post["/save-wireless", data = "<wireless_input>"]]
 pub fn save_wireless(wireless_input: Form<WirelessInput>) -> Redirect {
-  let data = sled::open("./data").unwrap();
-  let mut batch = sled::Batch::default();
+  let data: Db = open("./data").unwrap();
+  let mut batch: Batch = Batch::default();
 
-  let src_ssid = wireless_input.source_ssid.as_str();
-  let src_password = wireless_input.source_password.as_str();
+  let src_ssid: &str = wireless_input.source_ssid.as_str();
+  let src_password: &str = wireless_input.source_password.as_str();
 
   batch.insert("ap_ssid", wireless_input.ap_ssid.as_str());
   batch.insert("ap_password", wireless_input.ap_password.as_str());
@@ -202,11 +203,11 @@ pub fn save_credential(
   credential_input: Form<LoginInput>,
   cookies: &CookieJar<'_>,
 ) -> Redirect {
-  let data = sled::open("./data").unwrap();
-  let mut batch = sled::Batch::default();
+  let data: Db = open("./data").unwrap();
+  let mut batch: Batch = Batch::default();
 
-  let username = credential_input.username.as_str();
-  let password = credential_input.password.as_str();
+  let username: &str = credential_input.username.as_str();
+  let password: &str = credential_input.password.as_str();
 
   batch.insert("username", username);
   batch.insert("password", password);
@@ -218,7 +219,7 @@ pub fn save_credential(
   let _ = data.flush();
   drop(data);
 
-  let token_string = match generate_token(username) {
+  let token_string: Result<String, Status> = match generate_token(username) {
     Ok(token) => Ok(token),
     Err(_) => Err(Status::InternalServerError),
   };
@@ -230,11 +231,11 @@ pub fn save_credential(
 
 #[post("/", data = "<login_input>")]
 pub fn auth(login_input: Form<LoginInput>, cookies: &CookieJar<'_>) -> Redirect {
-  let username = &login_input.username;
-  let password = &login_input.password;
+  let username: &String = &login_input.username;
+  let password: &String = &login_input.password;
 
-  let data = sled::open("./data").unwrap();
-  let salt = &get_salt(&data);
+  let data: Db = open("./data").unwrap();
+  let salt: &String = &get_salt(&data);
 
   if !data.contains_key(username).unwrap() {
     data
@@ -244,8 +245,8 @@ pub fn auth(login_input: Form<LoginInput>, cookies: &CookieJar<'_>) -> Redirect 
     let _ = data.flush();
   }
 
-  let stored = data.get(username).unwrap().unwrap();
-  let val = str::from_utf8(stored.as_ref()).unwrap();
+  let stored: IVec = data.get(username).unwrap().unwrap();
+  let val: &str = str::from_utf8(stored.as_ref()).unwrap();
 
   drop(data);
 
@@ -253,7 +254,7 @@ pub fn auth(login_input: Form<LoginInput>, cookies: &CookieJar<'_>) -> Redirect 
     return Redirect::to("/");
   }
 
-  let token_string = match generate_token(username) {
+  let token_string: Result<String, Status> = match generate_token(username) {
     Ok(token) => Ok(token),
     Err(_) => Err(Status::InternalServerError),
   };
